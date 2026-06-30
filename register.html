@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillProof - Register</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="brand">SkillProof</div>
+    <nav class="app-nav">
+      <a href="home.html">Dashboard</a>
+      <a href="login.html">Login</a>
+      <a href="register.html" class="active">Register</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-wrapper">
+
+    <section class="banner-section">
+      <span class="banner-eyebrow">New Account</span>
+      <h1>Create Your Account</h1>
+      <p>Join SkillProof and get your GitHub skills verified.</p>
+    </section>
+
+    <section class="form-section">
+      <div class="form-card">
+        <h2>Register</h2>
+        <p class="form-sub">It only takes your GitHub username and a minute.</p>
+
+        <div class="form-group">
+          <label for="fullname">Full Name</label>
+          <input type="text" id="fullname" placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="Enter your email">
+        </div>
+
+        <div class="form-group">
+          <label for="github">GitHub Username</label>
+          <input type="text" id="github" placeholder="e.g. octocat">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Create a password">
+        </div>
+
+        <div class="form-group">
+          <label for="role">Register As</label>
+          <select id="role">
+            <option value="developer">Developer</option>
+            <option value="recruiter">Recruiter</option>
+          </select>
+        </div>
+
+        <button class="btn-primary">Create Account</button>
+
+        <p>Already have an account? <a href="login.html">Login here</a></p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 SkillProof — Evidence-Based Developer Assessment Platform</p>
+  </footer>
+
+</body>
+</html>

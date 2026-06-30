@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillProof - Recruiter Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="brand">SkillProof</div>
+    <nav class="app-nav">
+      <a href="home.html">Dashboard</a>
+      <a href="skills.html">Skills</a>
+      <a href="recruiter.html" class="active">Recruiter</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-wrapper">
+
+    <section class="banner-section">
+      <span class="banner-eyebrow">Recruiter View</span>
+      <h1>Recruiter Dashboard</h1>
+      <p>Search and evaluate GitHub-verified developer profiles.</p>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <h3>Total Developers</h3>
+          <div class="stat-icon">&#128101;</div>
+        </div>
+        <p class="stat-number">1,245</p>
+        <p class="stat-sub">Indexed profiles</p>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <h3>High Trust Profiles</h3>
+          <div class="stat-icon">&#9733;</div>
+        </div>
+        <p class="stat-number">342</p>
+        <p class="stat-sub up">&#8593; Trust score 80+</p>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <h3>Reports Generated</h3>
+          <div class="stat-icon">&#128196;</div>
+        </div>
+        <p class="stat-number">89</p>
+        <p class="stat-sub">This month</p>
+      </div>
+    </section>
+
+    <section class="recruiter-table-wrapper" style="margin-top: 1.5rem;">
+      <table>
+        <thead>
+          <tr>
+            <th>Developer</th>
+            <th>Top Skill</th>
+            <th>Trust Score</th>
+            <th>Career Fit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="dev-name">Md. Rakib Mia</td>
+            <td class="dev-skill">PHP</td>
+            <td><span class="badge badge-high">&#10003; 87</span></td>
+            <td>Backend Developer</td>
+          </tr>
+          <tr>
+            <td class="dev-name">Nondini Ghosh</td>
+            <td class="dev-skill">JavaScript</td>
+            <td><span class="badge badge-high">&#10003; 81</span></td>
+            <td>Full Stack Developer</td>
+          </tr>
+          <tr>
+            <td class="dev-name">Sumaiya Khatun</td>
+            <td class="dev-skill">SQL</td>
+            <td><span class="badge badge-medium">68</span></td>
+            <td>Database Developer</td>
+          </tr>
+          <tr>
+            <td class="dev-name">Maria Eyamin</td>
+            <td class="dev-skill">HTML / CSS</td>
+            <td><span class="badge badge-high">&#10003; 79</span></td>
+            <td>Frontend Developer</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 SkillProof — Evidence-Based Developer Assessment Platform</p>
+  </footer>
+
+</body>
+</html>
