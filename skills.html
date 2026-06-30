@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkillProof - Skill Scores</title>
+  <title>SkillProof - Verified Skills</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
   <header class="app-header">
     <div class="brand">SkillProof</div>
-    <nav class="app-nav">
+
+    <nav class="app-nav" aria-label="Main navigation">
       <a href="home.html">Dashboard</a>
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
       <a href="skills.html" class="active">Skills</a>
       <a href="recruiter.html">Recruiter</a>
     </nav>
@@ -20,103 +23,210 @@
   <main class="dashboard-wrapper">
 
     <section class="banner-section">
-      <span class="banner-eyebrow">Skill Verification</span>
-      <h1>Verified Skill Scores</h1>
-      <p>Skill levels calculated from your GitHub repository evidence.</p>
+      <span class="banner-eyebrow">Verified Skill Analysis</span>
+      <h1>Developer Skill Verification</h1>
+      <p>
+        SkillProof analyzes real GitHub evidence such as repository activity, programming
+        languages, commit history, and documentation quality to generate verified skill scores.
+      </p>
     </section>
 
-    <section class="stats-grid">
-      <div class="stat-card">
+    <section class="stats-grid" aria-label="Skill summary statistics">
+      <article class="stat-card">
         <div class="stat-card-top">
-          <h3>Overall Trust Score</h3>
-          <div class="stat-icon">&#9733;</div>
-        </div>
-        <p class="stat-number">87</p>
-        <p class="stat-sub up">&#8593; High trust profile</p>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-card-top">
-          <h3>Top Skill</h3>
-          <div class="stat-icon">&#9889;</div>
-        </div>
-        <p class="stat-number">PHP</p>
-        <p class="stat-sub">78% evidence score</p>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-card-top">
-          <h3>Skills Detected</h3>
+          <h3>Verified Skills</h3>
           <div class="stat-icon">&#10003;</div>
         </div>
-        <p class="stat-number">6</p>
-        <p class="stat-sub">From 24 repositories</p>
+        <p class="stat-number">12</p>
+        <p class="stat-sub up">&#8593; Based on GitHub evidence</p>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-card-top">
+          <h3>Repositories Checked</h3>
+          <div class="stat-icon">&#128187;</div>
+        </div>
+        <p class="stat-number">24</p>
+        <p class="stat-sub">Public repositories analyzed</p>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-card-top">
+          <h3>Average Skill Score</h3>
+          <div class="stat-icon">&#9733;</div>
+        </div>
+        <p class="stat-number">82%</p>
+        <p class="stat-sub up">&#8593; Strong technical profile</p>
+      </article>
+    </section>
+
+    <section class="skills-overview section-spaced" aria-labelledby="skills-title">
+      <div class="section-heading">
+        <span class="banner-eyebrow">Technical Competencies</span>
+        <h2 id="skills-title">Verified Skill Scores</h2>
+        <p>
+          Each score is calculated using repository count, code evidence, commit consistency,
+          and project documentation quality.
+        </p>
+      </div>
+
+      <div class="skill-card-grid">
+        <article class="skill-card">
+          <div class="skill-card-header">
+            <h3>HTML & CSS</h3>
+            <span class="skill-level high">Advanced</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill html-css"></div>
+          </div>
+          <p class="skill-score">Score: 90%</p>
+          <p class="skill-evidence">Evidence: Responsive layouts, semantic HTML, Flexbox, CSS Grid.</p>
+        </article>
+
+        <article class="skill-card">
+          <div class="skill-card-header">
+            <h3>JavaScript</h3>
+            <span class="skill-level medium">Intermediate</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill javascript"></div>
+          </div>
+          <p class="skill-score">Score: 76%</p>
+          <p class="skill-evidence">Evidence: DOM interaction, validation logic, and UI behavior.</p>
+        </article>
+
+        <article class="skill-card">
+          <div class="skill-card-header">
+            <h3>PHP</h3>
+            <span class="skill-level high">Strong</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill php"></div>
+          </div>
+          <p class="skill-score">Score: 84%</p>
+          <p class="skill-evidence">Evidence: Backend structure, form handling, and server-side logic.</p>
+        </article>
+
+        <article class="skill-card">
+          <div class="skill-card-header">
+            <h3>SQL</h3>
+            <span class="skill-level medium">Intermediate</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill sql"></div>
+          </div>
+          <p class="skill-score">Score: 72%</p>
+          <p class="skill-evidence">Evidence: Database schema, query usage, and relational design.</p>
+        </article>
+
+        <article class="skill-card">
+          <div class="skill-card-header">
+            <h3>Git & GitHub</h3>
+            <span class="skill-level high">Strong</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill git"></div>
+          </div>
+          <p class="skill-score">Score: 88%</p>
+          <p class="skill-evidence">Evidence: Branching, commits, pull requests, and conflict resolution.</p>
+        </article>
+
+        <article class="skill-card">
+          <div class="skill-card-header">
+            <h3>Documentation</h3>
+            <span class="skill-level medium">Good</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill docs"></div>
+          </div>
+          <p class="skill-score">Score: 78%</p>
+          <p class="skill-evidence">Evidence: README quality, project explanation, and file organization.</p>
+        </article>
       </div>
     </section>
 
-    <section class="skill-list" style="margin-top: 1.5rem;">
-      <p class="section-title">Evidence Breakdown</p>
-
-      <div class="skill-item">
-        <div class="skill-label">
-          <span class="skill-name">PHP</span>
-          <span class="skill-pct">78%</span>
-        </div>
-        <div class="skill-bar-bg">
-          <div class="skill-bar-fill" style="width: 78%;"></div>
-        </div>
+    <section class="evidence-panel section-spaced" aria-labelledby="evidence-title">
+      <div class="section-heading">
+        <span class="banner-eyebrow">GitHub Evidence</span>
+        <h2 id="evidence-title">Skill Verification Evidence</h2>
+        <p>
+          SkillProof does not depend only on self-reported CV skills. It checks real project
+          evidence from GitHub repositories.
+        </p>
       </div>
 
-      <div class="skill-item">
-        <div class="skill-label">
-          <span class="skill-name">JavaScript</span>
-          <span class="skill-pct">65%</span>
-        </div>
-        <div class="skill-bar-bg">
-          <div class="skill-bar-fill" style="width: 65%;"></div>
-        </div>
+      <div class="evidence-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Skill</th>
+              <th>Evidence Source</th>
+              <th>Score</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>HTML / CSS</td>
+              <td>Frontend files, semantic structure, responsive layout</td>
+              <td>90%</td>
+              <td><span class="badge badge-high">Verified</span></td>
+            </tr>
+
+            <tr>
+              <td>Git & GitHub</td>
+              <td>Commits, branches, pull requests, merge history</td>
+              <td>88%</td>
+              <td><span class="badge badge-high">Verified</span></td>
+            </tr>
+
+            <tr>
+              <td>PHP</td>
+              <td>Backend files and server-side project structure</td>
+              <td>84%</td>
+              <td><span class="badge badge-high">Verified</span></td>
+            </tr>
+
+            <tr>
+              <td>SQL</td>
+              <td>Database schema and query evidence</td>
+              <td>72%</td>
+              <td><span class="badge badge-medium">Needs Review</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="learning-gap-panel section-spaced" aria-labelledby="gap-title">
+      <div class="section-heading">
+        <span class="banner-eyebrow">Learning Recommendation</span>
+        <h2 id="gap-title">Learning Gap Detection</h2>
+        <p>
+          The system identifies weaker areas and recommends improvement paths for the developer.
+        </p>
       </div>
 
-      <div class="skill-item">
-        <div class="skill-label">
-          <span class="skill-name">SQL</span>
-          <span class="skill-pct">72%</span>
-        </div>
-        <div class="skill-bar-bg">
-          <div class="skill-bar-fill" style="width: 72%;"></div>
-        </div>
-      </div>
+      <div class="gap-grid">
+        <article class="gap-card">
+          <h3>Improve SQL Practice</h3>
+          <p>Practice joins, aggregation, indexing, and relational database design.</p>
+          <span class="gap-priority medium">Medium Priority</span>
+        </article> 
 
-      <div class="skill-item">
-        <div class="skill-label">
-          <span class="skill-name">HTML / CSS</span>
-          <span class="skill-pct">85%</span>
-        </div>
-        <div class="skill-bar-bg">
-          <div class="skill-bar-fill" style="width: 85%;"></div>
-        </div>
-      </div>
+        <article class="gap-card">
+          <h3>Improve JavaScript Projects</h3>
+          <p>Add more interactive features such as form validation and dashboard filtering.</p>
+          <span class="gap-priority medium">Medium Priority</span>
+        </article>
 
-      <div class="skill-item">
-        <div class="skill-label">
-          <span class="skill-name">Git</span>
-          <span class="skill-pct">70%</span>
-        </div>
-        <div class="skill-bar-bg">
-          <div class="skill-bar-fill" style="width: 70%;"></div>
-        </div>
+        <article class="gap-card">
+          <h3>Strengthen Documentation</h3>
+          <p>Add setup instructions, screenshots, project features, and contribution details.</p>
+          <span class="gap-priority low">Low Priority</span>
+        </article>
       </div>
-
-      <div class="skill-item">
-        <div class="skill-label">
-          <span class="skill-name">Java</span>
-          <span class="skill-pct">55%</span>
-        </div>
-        <div class="skill-bar-bg">
-          <div class="skill-bar-fill" style="width: 55%;"></div>
-        </div>
-      </div>
-
     </section>
 
   </main>
