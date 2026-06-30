@@ -10,40 +10,80 @@
 
   <header class="app-header">
     <div class="brand">SkillProof</div>
-    <nav class="app-nav">
+
+    <nav class="app-nav" aria-label="Main navigation">
       <a href="home.html">Dashboard</a>
       <a href="login.html" class="active">Login</a>
       <a href="register.html">Register</a>
+      <a href="skills.html">Skills</a>
+      <a href="recruiter.html">Recruiter</a>
     </nav>
   </header>
 
   <main class="dashboard-wrapper">
 
     <section class="banner-section">
-      <span class="banner-eyebrow">Account Access</span>
+      <span class="banner-eyebrow">Secure Account Access</span>
       <h1>Login to SkillProof</h1>
-      <p>Access your verified developer profile and reports.</p>
+      <p>
+        Access your verified developer profile, GitHub evidence, Trust Score,
+        and assessment reports.
+      </p>
     </section>
 
-    <section class="form-section">
-      <div class="form-card">
-        <h2>Welcome back</h2>
-        <p class="form-sub">Enter your credentials to continue.</p>
+    <section class="form-section" aria-labelledby="login-title">
+      <form class="form-card" action="#" method="post">
+        <h2 id="login-title">Welcome Back</h2>
+        <p class="form-sub">
+          Enter your account details to continue to your SkillProof dashboard.
+        </p>
 
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input type="email" id="email" placeholder="Enter your email">
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="example@email.com"
+            autocomplete="email"
+            required
+          >
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" placeholder="Enter your password">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          >
         </div>
 
-        <button class="btn-primary">Login</button>
+        <div class="form-group">
+          <label for="role">Login As</label>
+          <select id="role" name="role" required>
+            <option value="">Select account type</option>
+            <option value="developer">Developer</option>
+            <option value="recruiter">Recruiter</option>
+            <option value="admin">Administrator</option>
+          </select>
+        </div>
 
-        <p>Don't have an account? <a href="register.html">Register here</a></p>
-      </div>
+        <button type="submit" class="btn-primary">Login</button>
+
+        <p class="form-link">
+          Forgot your password?
+          <a href="#">Reset here</a>
+        </p>
+
+        <p class="form-link">
+          Don't have an account?
+          <a href="register.html">Create an account</a>
+        </p>
+      </form>
     </section>
 
   </main>
