@@ -10,8 +10,11 @@
 
   <header class="app-header">
     <div class="brand">SkillProof</div>
-    <nav class="app-nav">
+
+    <nav class="app-nav" aria-label="Main navigation">
       <a href="home.html">Dashboard</a>
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
       <a href="skills.html">Skills</a>
       <a href="recruiter.html" class="active">Recruiter</a>
     </nav>
@@ -22,39 +25,82 @@
     <section class="banner-section">
       <span class="banner-eyebrow">Recruiter View</span>
       <h1>Recruiter Dashboard</h1>
-      <p>Search and evaluate GitHub-verified developer profiles.</p>
+      <p>
+        Search verified developer profiles, compare Trust Scores, and review GitHub-based
+        skill evidence for better hiring decisions.
+      </p>
     </section>
 
-    <section class="stats-grid">
-      <div class="stat-card">
+    <section class="stats-grid" aria-label="Recruiter dashboard summary">
+      <article class="stat-card">
         <div class="stat-card-top">
           <h3>Total Developers</h3>
           <div class="stat-icon">&#128101;</div>
         </div>
         <p class="stat-number">1,245</p>
-        <p class="stat-sub">Indexed profiles</p>
-      </div>
+        <p class="stat-sub">Verified developer profiles</p>
+      </article>
 
-      <div class="stat-card">
+      <article class="stat-card">
         <div class="stat-card-top">
           <h3>High Trust Profiles</h3>
           <div class="stat-icon">&#9733;</div>
         </div>
         <p class="stat-number">342</p>
-        <p class="stat-sub up">&#8593; Trust score 80+</p>
-      </div>
+        <p class="stat-sub up">&#8593; Trust Score 80+</p>
+      </article>
 
-      <div class="stat-card">
+      <article class="stat-card">
         <div class="stat-card-top">
           <h3>Reports Generated</h3>
           <div class="stat-icon">&#128196;</div>
         </div>
         <p class="stat-number">89</p>
         <p class="stat-sub">This month</p>
-      </div>
+      </article>
     </section>
 
-    <section class="recruiter-table-wrapper" style="margin-top: 1.5rem;">
+    <section class="filter-panel section-spaced" aria-labelledby="filter-title">
+      <div>
+        <h2 id="filter-title">Search Developer Profiles</h2>
+        <p>Filter candidates by skill, role, and minimum Trust Score.</p>
+      </div>
+
+      <form class="filter-grid" action="#" method="get">
+        <div class="filter-group">
+          <label for="skill">Skill</label>
+          <select id="skill" name="skill">
+            <option value="">All Skills</option>
+            <option value="html-css">HTML / CSS</option>
+            <option value="javascript">JavaScript</option>
+            <option value="php">PHP</option>
+            <option value="sql">SQL</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="role">Career Role</label>
+          <select id="role" name="role">
+            <option value="">All Roles</option>
+            <option value="frontend">Frontend Developer</option>
+            <option value="backend">Backend Developer</option>
+            <option value="fullstack">Full Stack Developer</option>
+            <option value="database">Database Developer</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="score">Minimum Trust Score</label>
+          <input type="number" id="score" name="score" min="0" max="100" placeholder="e.g. 70">
+        </div>
+
+        <button type="submit" class="btn-filter">Apply Filter</button>
+      </form>
+    </section>
+
+    <section class="recruiter-table-wrapper section-spaced" aria-labelledby="candidate-table-title">
+      <h2 id="candidate-table-title" class="section-title">Verified Candidate List</h2>
+
       <table>
         <thead>
           <tr>
@@ -62,35 +108,88 @@
             <th>Top Skill</th>
             <th>Trust Score</th>
             <th>Career Fit</th>
+            <th>Report</th>
           </tr>
         </thead>
+
         <tbody>
           <tr>
             <td class="dev-name">Md. Rakib Mia</td>
             <td class="dev-skill">PHP</td>
             <td><span class="badge badge-high">&#10003; 87</span></td>
             <td>Backend Developer</td>
+            <td><button class="btn-small">Download</button></td>
           </tr>
+
           <tr>
             <td class="dev-name">Nondini Ghosh</td>
             <td class="dev-skill">JavaScript</td>
             <td><span class="badge badge-high">&#10003; 81</span></td>
             <td>Full Stack Developer</td>
+            <td><button class="btn-small">Download</button></td>
           </tr>
+
           <tr>
             <td class="dev-name">Sumaiya Khatun</td>
             <td class="dev-skill">SQL</td>
             <td><span class="badge badge-medium">68</span></td>
             <td>Database Developer</td>
+            <td><button class="btn-small">Download</button></td>
           </tr>
+
           <tr>
             <td class="dev-name">Maria Eyamin</td>
             <td class="dev-skill">HTML / CSS</td>
             <td><span class="badge badge-high">&#10003; 79</span></td>
             <td>Frontend Developer</td>
+            <td><button class="btn-small">Download</button></td>
           </tr>
         </tbody>
       </table>
+    </section>
+
+    <section class="candidate-grid section-spaced" aria-label="Recommended candidates">
+      <article class="candidate-card">
+        <div class="candidate-header">
+          <div class="avatar">R</div>
+          <div>
+            <h3>Md. Rakib Mia</h3>
+            <p>Backend Developer Match</p>
+          </div>
+        </div>
+        <p class="candidate-note">
+          Strong repository activity, PHP evidence, and consistent documentation quality.
+        </p>
+        <span class="score-pill">Trust Score: 87</span>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-header">
+          <div class="avatar">N</div>
+          <div>
+            <h3>Nondini Ghosh</h3>
+            <p>Full Stack Developer Match</p>
+          </div>
+        </div>
+        <p class="candidate-note">
+          Good JavaScript activity with balanced frontend and backend contribution evidence.
+        </p>
+        <span class="score-pill">Trust Score: 81</span>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-header">
+          <div class="avatar">M</div>
+          <div>
+            <h3>Maria Eyamin</h3>
+            <p>Frontend Developer Match</p>
+          </div>
+        </div>
+        <p class="candidate-note">
+          Strong HTML/CSS evidence and responsive interface design contribution.
+        </p>
+        <span class="score-pill">Trust Score: 79</span>
+      </article>
     </section>
 
   </main>
