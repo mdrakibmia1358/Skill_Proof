@@ -1,54 +1,62 @@
-# SkillProof - File & Branch Assignment
+# SkillProof
 
-এই zip এ ৫টা HTML file এবং ১টা shared styles.css আছে।
-নিচের table অনুযায়ী যার যার file নিজের branch এ push করবে।
+SkillProof is an evidence-based developer assessment platform that evaluates developers using real GitHub activity instead of self-reported CV claims.
 
-| File          | কে কাজ করবে    | Branch নাম                  |
-|---------------|----------------|------------------------------|
-| home.html     | Rakib (Leader) | feature/dashboard-rakib      |
-| login.html    | Nondini        | feature/profile-nondini      |
-| register.html | Nondini        | feature/profile-nondini      |
-| skills.html   | Sumaiya        | feature/skills-sumaiya       |
-| recruiter.html| Maria          | feature/recruiter-maria      |
-| styles.css    | সবাই ব্যবহার করবে (প্রথমে main এ push করে দাও) | main (shared) |
+## Project Overview
 
-## কীভাবে কাজ করবে — Step by Step
+The platform analyzes GitHub repositories, commit history, documentation quality, technology usage, and contribution patterns to generate verified skill scores and a Developer Trust Score.
 
-### সবার আগে (Rakib করবে):
-1. styles.css ফাইলটা প্রথমে main branch এ push করে দাও,
-   যাতে সবাই branch বানানোর সময় এটা পেয়ে যায়।
+## Main Features
+
+- User registration and login interface
+- Developer dashboard
+- GitHub evidence-based skill assessment concept
+- Verified skills page
+- Recruiter dashboard
+- Responsive front-end layout
+- Mobile-first design using HTML5 and CSS3
+
+## Pages
+
+- `home.html` - Main dashboard page
+- `login.html` - User login page
+- `register.html` - User registration page
+- `skills.html` - Verified skills page
+- `recruiter.html` - Recruiter dashboard page
+- `styles.css` - Main stylesheet
+
+## Technologies Used
+
+- HTML5
+- CSS3
+- Flexbox
+- CSS Grid
+- Media Query
+- Git and GitHub
+
+## Team Members
+
+| Role | Name |
+|---|---|
+| Team Leader | Md. Rakib Mia |
+| Member | Nondini Ghosh |
+| Member | Sumaiya Khatun |
+| Member | Maria Eyamin |
+
+## Week 2 Lab Work
+
+This repository includes:
+
+- Shared GitHub repository setup
+- Feature branch workflow
+- Individual team member contributions
+- Pull request based collaboration
+- Responsive dashboard design
+- Merge conflict simulation and resolution proof
+
+## How to Run
+
+Open `home.html` in any modern web browser.
 
 ```bash
-cd ~/skillproof
-git checkout main
-git pull origin main
-# styles.css কপি করে এখানে রাখো
-git add styles.css
-git commit -m "Add shared stylesheet"
-git push origin main
-```
-
-### এরপর প্রত্যেকে নিজের branch বানাবে:
-
-```bash
-git checkout main
-git pull origin main
-git checkout -b feature/<তোমার-branch-নাম>
-```
-
-### নিজের HTML file(গুলো) এই folder এ কপি করে রাখবে, তারপর:
-
-```bash
-git add .
-git commit -m "Add <file-name> page"
-git push origin feature/<তোমার-branch-নাম>
-```
-
-### সবশেষে Rakib GitHub এ গিয়ে প্রত্যেকের Pull Request
-main branch এ merge করে দেবে।
-
-## ফাইলগুলো একে অপরের সাথে link করা আছে
-প্রতিটা page এর উপরে navigation bar এ home.html, login.html,
-skills.html, recruiter.html এর লিংক আছে। তাই সব file একই
-folder এ থাকলে browser এ click করে এক page থেকে অন্য page এ
-যাওয়া যাবে।
+xdg-open home.html
