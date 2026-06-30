@@ -824,3 +824,112 @@ td {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+/* ===== Authentication Page Styles ===== */
+
+.form-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 520px;
+  background-color: var(--surface, #ffffff);
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+.form-card h2 {
+  color: var(--ink, #0f172a);
+  font-size: 1.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.form-sub {
+  color: var(--ink-soft, #64748b);
+  font-size: 0.92rem;
+  margin-bottom: 1.4rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--ink, #0f172a);
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.72rem 0.85rem;
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 8px;
+  background-color: var(--canvas, #f8fafc);
+  font-size: 0.95rem;
+  font-family: var(--sans, Arial, sans-serif);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--signal, #2563eb);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.78rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--signal, #2563eb);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 0.4rem;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.form-link {
+  margin-top: 1rem;
+  text-align: center;
+  color: var(--ink-soft, #64748b);
+  font-size: 0.9rem;
+}
+
+.form-link a {
+  color: var(--signal, #2563eb);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.form-link a:hover {
+  text-decoration: underline;
+}
+
+.app-nav a.active {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.app-footer {
+  color: #e2e8f0;
+}
+
+@media (min-width: 768px) {
+  .form-card {
+    padding: 2rem;
+  }
+}
