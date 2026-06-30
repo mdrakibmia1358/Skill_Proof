@@ -21,6 +21,12 @@ Developer A:
 Developer B:
 <title>SkillProof - Developer B Version</title>
 
+## Conflict Screenshot
+
+The screenshot below shows the merge conflict in VS Code.
+
+![Merge Conflict Screenshot](./merge-conflict-vscode.jpeg)
+
 ## Final Resolved Version
 <title>SkillProof - Dashboard</title>
 
