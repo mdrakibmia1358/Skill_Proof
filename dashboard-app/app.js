@@ -43,6 +43,14 @@ appContainer.innerHTML = `
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none state-transition"
           placeholder="Min 8 characters, uppercase, number, special character"
         >
+       <label class="flex items-center gap-2 text-sm text-gray-600 mt-2">
+         <input
+          type="checkbox"
+          id="show-password"
+          class="rounded border-gray-300"
+         >
+        Show password
+       </label>
 
         <div class="h-2 w-full bg-gray-200 rounded-full mt-2 overflow-hidden">
           <div id="strength-meter" class="h-full w-0 bg-red-500 state-transition"></div>
@@ -70,6 +78,16 @@ const emailError = document.getElementById('email-error');
 const userPassword = document.getElementById('user-password');
 const strengthMeter = document.getElementById('strength-meter');
 const strengthText = document.getElementById('strength-text');
+const showPassword = document.getElementById('show-password');
+
+// Show or hide password text
+showPassword.addEventListener('change', function () {
+  if (showPassword.checked) {
+    userPassword.type = 'text';
+  } else {
+    userPassword.type = 'password';
+  }
+});
 
 // Nondini: Interactive Email Real-Time Validation
 userEmail.addEventListener('input', function () {
