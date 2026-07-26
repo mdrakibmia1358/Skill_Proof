@@ -99,3 +99,63 @@ registrationForm.addEventListener('submit', function (event) {
     alert('Validation failed! Please correct the inputs before submitting.');
   }
 });
+
+// Maria: Reusable Stats Card Component
+function StatsCardComponent(title, count, statusColor) {
+  return `
+    <article class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 state-transition hover:shadow-md">
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+        ${title}
+      </h3>
+
+      <p class="text-3xl font-bold text-gray-900 mt-2">
+        ${count}
+      </p>
+
+      <div class="flex items-center mt-3">
+        <span class="h-2.5 w-2.5 rounded-full ${statusColor} mr-2"></span>
+        <span class="text-xs text-gray-600">Active Monitoring</span>
+      </div>
+    </article>
+  `;
+}
+
+// Simulated SkillProof data model array
+const systemStats = [
+  {
+    name: 'Verified Developer Profiles',
+    count: '1,245',
+    color: 'bg-green-500'
+  },
+  {
+    name: 'Skills Verified',
+    count: '12',
+    color: 'bg-blue-500'
+  },
+  {
+    name: 'Pending Reports',
+    count: '5',
+    color: 'bg-red-500'
+  }
+];
+
+// Render stats section using reusable component and array mapping
+function renderStatsSection() {
+  const sectionElement = document.createElement('section');
+  sectionElement.className = 'grid grid-cols-1 md:grid-cols-3 gap-6 mt-8';
+
+  let innerContentHTML = '';
+
+  systemStats.forEach(function (item) {
+    innerContentHTML += StatsCardComponent(
+      item.name,
+      item.count,
+      item.color
+    );
+  });
+
+  sectionElement.innerHTML = innerContentHTML;
+  appContainer.appendChild(sectionElement);
+}
+
+renderStatsSection();
