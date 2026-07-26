@@ -71,6 +71,21 @@ const userPassword = document.getElementById('user-password');
 const strengthMeter = document.getElementById('strength-meter');
 const strengthText = document.getElementById('strength-text');
 
+// Nondini: Interactive Email Real-Time Validation
+userEmail.addEventListener('input', function () {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (emailRegex.test(userEmail.value)) {
+    userEmail.classList.remove('border-red-500', 'focus:ring-red-500');
+    userEmail.classList.add('border-green-500', 'focus:ring-green-500');
+    emailError.classList.add('hidden');
+  } else {
+    userEmail.classList.remove('border-green-500', 'focus:ring-green-500');
+    userEmail.classList.add('border-red-500', 'focus:ring-red-500');
+    emailError.classList.remove('hidden');
+  }
+});
+
 // Rakib base submit handler
 registrationForm.addEventListener('submit', function (event) {
   event.preventDefault();
