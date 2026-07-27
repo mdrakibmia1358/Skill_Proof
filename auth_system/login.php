@@ -2,16 +2,20 @@
 session_start();
 
 $error_message = "";
-$success_message = $_GET['msg'] ?? "";
+$success_message = $_GET["msg"] ?? "";
 $email = "";
 
-if (isset($_SESSION['user_email'])) {
+function safe_output($value) {
+    return htmlspecialchars($value, ENT_QUOTES, "UTF-8");
+}
+
+if (isset($_SESSION["user_email"])) {
     header("Location: dashboard.php");
     exit();
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $email = trim($_POST["email"] ?? "");
+    $email = trim(filter_input(INPUT_POST, "email", FILTER_SANITIZE_EMAIL) ?? "");
     $password = $_POST["password"] ?? "";
 
     if (empty($email) || empty($password)) {
@@ -49,6 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <title>SkillProof - Secure Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen">
 
     <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 w-full max-w-md mx-4">
@@ -59,38 +64,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <?php if (!empty($success_message)): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 text-sm">
-                <?php echo htmlspecialchars($success_message); ?>
+                <?php echo safe_output($success_message); ?>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($error_message)): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
                 <span class="font-bold">Error:</span>
-                <?php echo htmlspecialchars($error_message); ?>
+                <?php echo safe_output($error_message); ?>
             </div>
         <?php endif; ?>
 
         <form action="login.php" method="POST" class="space-y-6">
             <div>
-                <label for="email" class="block text-sm font-bold text-gray-700 mb-1">Email Address</label>
+                <label for="email" class="block text-sm font-bold text-gray-700 mb-1">
+                    Email Address
+                </label>
+
                 <input
                     type="email"
                     id="email"
                     name="email"
                     required
+                    autocomplete="email"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="e.g., student@university.edu"
-                    value="<?php echo htmlspecialchars($email); ?>"
+                    value="<?php echo safe_output($email); ?>"
                 >
             </div>
 
             <div>
-                <label for="password" class="block text-sm font-bold text-gray-700 mb-1">Security Password</label>
+                <label for="password" class="block text-sm font-bold text-gray-700 mb-1">
+                    Security Password
+                </label>
+
                 <input
                     type="password"
                     id="password"
                     name="password"
                     required
+                    autocomplete="current-password"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Enter security key"
                 >
