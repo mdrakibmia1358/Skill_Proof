@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 $_SESSION = array();
 
 if (ini_get("session.use_cookies")) {
@@ -17,8 +21,9 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
+session_unset();
 session_destroy();
 
-header("Location: login.php?msg=You have logged out successfully");
+header("Location: login.php?msg=You have logged out successfully and your session was securely cleared");
 exit();
 ?>
