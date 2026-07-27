@@ -56,6 +56,31 @@ $_SESSION["last_activity"] = time();
                 </span>
             </p>
 
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg">
+                    <p class="text-xs text-gray-500 uppercase font-bold">User Email</p>
+                    <p class="text-sm font-semibold text-blue-900 mt-1">
+                          <?php echo htmlspecialchars($_SESSION["user_email"]); ?>
+                    </p>
+                </div>
+
+                <div class="bg-green-50 border border-green-100 p-4 rounded-lg">
+                   <p class="text-xs text-gray-500 uppercase font-bold">User Role</p>
+                   <p class="text-sm font-semibold text-green-800 mt-1">
+                        <?php echo htmlspecialchars($_SESSION["user_role"]); ?>
+                   </p>
+                </div>
+
+                <div class="bg-orange-50 border border-orange-100 p-4 rounded-lg">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Session Status</p>
+                    <p class="text-sm font-semibold text-orange-800 mt-1">
+                         Active and Protected
+                    </p>
+                </div>
+            </div>
+            
+
             <div class="mt-6 border-t border-gray-100 pt-6">
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">
                     Security Logging Metadata
