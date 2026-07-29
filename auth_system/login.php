@@ -54,74 +54,280 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen">
+<body class="min-h-screen bg-slate-100 font-sans text-slate-800">
 
-    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 w-full max-w-md mx-4">
-        <header class="mb-6 text-center">
-            <h1 class="text-3xl font-extrabold text-blue-900">SkillProof Portal</h1>
-            <p class="text-sm text-gray-500 mt-1">Secure backend login using PHP session.</p>
-        </header>
+    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
 
-        <?php if (!empty($success_message)): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 text-sm">
-                <?php echo safe_output($success_message); ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!empty($error_message)): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
-                <span class="font-bold">Error:</span>
-                <?php echo safe_output($error_message); ?>
-            </div>
-        <?php endif; ?>
-
-        <form action="login.php" method="POST" class="space-y-6">
+        <!-- Left Branding Panel -->
+        <section class="hidden lg:flex bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-12 flex-col justify-between">
             <div>
-                <label for="email" class="block text-sm font-bold text-gray-700 mb-1">
-                    Email Address
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    autocomplete="email"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    placeholder="e.g., student@university.edu"
-                    value="<?php echo safe_output($email); ?>"
-                >
+                <h1 class="text-5xl font-extrabold tracking-wide">SkillProof</h1>
+                <p class="mt-4 text-blue-100 text-lg">
+                    Evidence-Based Developer Assessment Platform
+                </p>
             </div>
 
-            <div>
-                <label for="password" class="block text-sm font-bold text-gray-700 mb-1">
-                    Security Password
-                </label>
+            <div class="max-w-xl">
+                <span class="inline-block bg-white/10 border border-white/10 rounded-full px-4 py-2 text-sm text-blue-100 mb-6">
+                    Developer Verification Portal
+                </span>
 
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    required
-                    autocomplete="current-password"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    placeholder="Enter security key"
-                >
+                <h2 class="text-4xl font-extrabold leading-tight">
+                    Verify skills with real evidence, not only CV claims.
+                </h2>
+
+                <p class="mt-6 text-slate-300 leading-7">
+                    Developers can submit skill evidence, verification records, and GitHub-based proof.
+                    Recruiters can review trusted skill profiles before making hiring decisions.
+                </p>
+
+                <div class="grid grid-cols-3 gap-4 mt-10">
+                    <div class="bg-white/10 border border-white/10 rounded-2xl p-5">
+                        <p class="text-3xl font-extrabold">1.2K+</p>
+                        <p class="text-xs text-slate-300 mt-1">Developers</p>
+                    </div>
+
+                    <div class="bg-white/10 border border-white/10 rounded-2xl p-5">
+                        <p class="text-3xl font-extrabold">342</p>
+                        <p class="text-xs text-slate-300 mt-1">Verified Skills</p>
+                    </div>
+
+                    <div class="bg-white/10 border border-white/10 rounded-2xl p-5">
+                        <p class="text-3xl font-extrabold">27</p>
+                        <p class="text-xs text-slate-300 mt-1">Recruiters</p>
+                    </div>
+                </div>
             </div>
 
-            <button
-                type="submit"
-                class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition duration-200"
-            >
-                Secure Sign-In
-            </button>
-        </form>
+            <p class="text-xs text-slate-400">
+                Developer access • Skill evidence • Recruiter trust
+            </p>
+        </section>
 
-        <div class="mt-6 text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-            <p><strong>Demo Email:</strong> student@university.edu</p>
-            <p><strong>Demo Password:</strong> secureStudent123</p>
-        </div>
+        <!-- Right Login Panel -->
+        <section class="flex items-center justify-center px-5 py-10">
+            <div class="w-full max-w-md">
+
+                <div class="text-center lg:hidden mb-8">
+                    <h1 class="text-4xl font-extrabold text-blue-950">SkillProof</h1>
+                    <p class="text-sm text-slate-500 mt-2">
+                        Evidence-Based Developer Assessment Platform
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 p-8">
+                    <div class="text-center mb-7">
+                        <h2 class="text-3xl font-extrabold text-blue-950">Welcome Back</h2>
+                        <p class="text-sm text-slate-500 mt-2">
+                            Sign in to access your dashboard.
+                        </p>
+                    </div>
+
+                    <?php if (!empty($success_message)): ?>
+                        <div class="bg-green-50 border border-green-300 text-green-700 px-4 py-3 rounded-xl mb-5 text-sm">
+                            <?php echo safe_output($success_message); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($error_message)): ?>
+                        <div class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-xl mb-5 text-sm">
+                            <span class="font-bold">Error:</span>
+                            <?php echo safe_output($error_message); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form id="loginForm" action="login.php" method="POST" class="space-y-5" novalidate>
+                        <div>
+                            <label for="email" class="block text-sm font-bold text-slate-700 mb-2">
+                                Email Address
+                            </label>
+
+                            <input
+                                type="text"
+                                inputmode="email"
+                                id="email"
+                                name="email"
+                                required
+                                autocomplete="email"
+                                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition"
+                                placeholder="Enter your email address"
+                                value="<?php echo safe_output($email); ?>"
+                            >
+
+                            <p id="emailMessage" class="text-xs text-slate-400 mt-2">
+                                Use a valid email format, for example student@university.edu
+                            </p>
+                        </div>
+
+                        <div>
+                            <label for="password" class="block text-sm font-bold text-slate-700 mb-2">
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                required
+                                autocomplete="current-password"
+                                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition"
+                                placeholder="Enter your password"
+                            >
+
+                            <div class="mt-3 flex items-center justify-between">
+                                <label class="flex items-center gap-2 text-sm text-slate-600">
+                                    <input type="checkbox" id="showPassword" class="rounded border-slate-300">
+                                    Show password
+                                </label>
+
+                                <span id="strengthLabel" class="text-xs font-semibold text-slate-400">
+                                    Strength: -
+                                </span>
+                            </div>
+
+                            <div class="mt-3">
+                                <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                                    <div
+                                        id="strengthBar"
+                                        class="h-2 bg-slate-300 rounded-full transition-all duration-300"
+                                        style="width: 0%;"
+                                    ></div>
+                                </div>
+
+                                <p id="strengthText" class="text-xs text-slate-500 mt-2">
+                                    Use at least 8 characters with uppercase, number, and special character.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-xl transition duration-200 shadow-lg shadow-blue-900/20"
+                        >
+                            Login
+                        </button>
+                    </form>
+
+                    <div class="mt-6 grid grid-cols-2 gap-3 text-xs">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                            <p class="font-bold text-slate-700">Developer Access</p>
+                            <p class="text-slate-500 mt-1">Verified portal entry</p>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                            <p class="font-bold text-slate-700">Skill Evidence</p>
+                            <p class="text-slate-500 mt-1">Proof-based profile</p>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                            <p class="font-bold text-slate-700">Recruiter Ready</p>
+                            <p class="text-slate-500 mt-1">Trusted skill view</p>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                            <p class="font-bold text-slate-700">Session Control</p>
+                            <p class="text-slate-500 mt-1">Protected workspace</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-center text-xs text-slate-400 mt-5">
+                    SkillProof Developer Verification Portal
+                </p>
+            </div>
+        </section>
     </div>
+
+    <script>
+        const loginForm = document.getElementById("loginForm");
+        const emailInput = document.getElementById("email");
+        const emailMessage = document.getElementById("emailMessage");
+
+        const passwordInput = document.getElementById("password");
+        const showPassword = document.getElementById("showPassword");
+        const strengthBar = document.getElementById("strengthBar");
+        const strengthText = document.getElementById("strengthText");
+        const strengthLabel = document.getElementById("strengthLabel");
+
+        function isValidEmail(email) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function setEmailState() {
+            const email = emailInput.value.trim();
+
+            if (email.length === 0) {
+                emailInput.className = "w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition";
+                emailMessage.textContent = "Use a valid email format, for example student@university.edu";
+                emailMessage.className = "text-xs text-slate-400 mt-2";
+                return false;
+            }
+
+            if (!isValidEmail(email)) {
+                emailInput.className = "w-full px-4 py-3 border border-red-400 bg-red-50 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none transition";
+                emailMessage.textContent = "Invalid email format. Please include @ and a domain name.";
+                emailMessage.className = "text-xs text-red-600 mt-2 font-semibold";
+                return false;
+            }
+
+            emailInput.className = "w-full px-4 py-3 border border-green-400 bg-green-50 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none transition";
+            emailMessage.textContent = "Valid email format.";
+            emailMessage.className = "text-xs text-green-600 mt-2 font-semibold";
+            return true;
+        }
+
+        emailInput.addEventListener("input", setEmailState);
+        emailInput.addEventListener("blur", setEmailState);
+
+        loginForm.addEventListener("submit", function (event) {
+            const validEmail = setEmailState();
+
+            if (!validEmail) {
+                event.preventDefault();
+                emailInput.focus();
+            }
+        });
+
+        showPassword.addEventListener("change", function () {
+            passwordInput.type = this.checked ? "text" : "password";
+        });
+
+        passwordInput.addEventListener("input", function () {
+            const password = passwordInput.value;
+            let score = 0;
+
+            if (password.length >= 8) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+
+            if (password.length === 0) {
+                strengthBar.style.width = "0%";
+                strengthBar.className = "h-2 bg-slate-300 rounded-full transition-all duration-300";
+                strengthText.textContent = "Use at least 8 characters with uppercase, number, and special character.";
+                strengthLabel.textContent = "Strength: -";
+                strengthLabel.className = "text-xs font-semibold text-slate-400";
+            } else if (score <= 1) {
+                strengthBar.style.width = "30%";
+                strengthBar.className = "h-2 bg-red-500 rounded-full transition-all duration-300";
+                strengthText.textContent = "Weak password. Add more characters, number, uppercase, or special symbol.";
+                strengthLabel.textContent = "Strength: Weak";
+                strengthLabel.className = "text-xs font-semibold text-red-600";
+            } else if (score <= 3) {
+                strengthBar.style.width = "65%";
+                strengthBar.className = "h-2 bg-yellow-500 rounded-full transition-all duration-300";
+                strengthText.textContent = "Medium password. Add all recommended rules for stronger security.";
+                strengthLabel.textContent = "Strength: Medium";
+                strengthLabel.className = "text-xs font-semibold text-yellow-600";
+            } else {
+                strengthBar.style.width = "100%";
+                strengthBar.className = "h-2 bg-green-500 rounded-full transition-all duration-300";
+                strengthText.textContent = "Strong password.";
+                strengthLabel.textContent = "Strength: Strong";
+                strengthLabel.className = "text-xs font-semibold text-green-600";
+            }
+        });
+    </script>
 
 </body>
 </html>
