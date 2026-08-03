@@ -95,11 +95,15 @@ $masked_session_id = session_id() !== ""
         </div>
 
         <nav class="p-4 space-y-2 text-sm">
+            <a href="../home.html" class="block px-4 py-3 rounded-lg hover:bg-slate-800 mb-2 border-b border-slate-800 pb-4">
+                &larr; Back to Home
+            </a>
             <a href="#dashboard" class="block px-4 py-3 rounded-lg bg-blue-600 font-bold">Dashboard</a>
             <a href="#github" class="block px-4 py-3 rounded-lg hover:bg-slate-800">GitHub Connection</a>
             <a href="#skills" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Skill Verification</a>
             <a href="#dimensions" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Score Dimensions</a>
             <a href="#gaps" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Learning Gap</a>
+            <a href="#history" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Analysis History</a>
             <a href="#security" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Account Security</a>
         </nav>
 
@@ -339,6 +343,35 @@ $masked_session_id = session_id() !== ""
             </div>
 
             <div id="security" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <div id="history" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <p class="text-xs uppercase tracking-widest text-blue-700 font-extrabold">Analysis History</p>
+                <h3 class="text-xl font-extrabold mt-1">Past GitHub Analysis Runs</h3>
+                <p class="text-sm text-slate-500 mb-4">Your last 5 analysis runs saved to the database.</p>
+                <?php if (empty($analysisHistory)): ?>
+                    <p class="text-sm text-slate-400">No analysis history yet. Run an analysis above to see it here.</p>
+                <?php else: ?>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-left text-slate-500">
+                                <th class="py-2">GitHub Username</th>
+                                <th class="py-2">Repositories</th>
+                                <th class="py-2">Stars</th>
+                                <th class="py-2">Analyzed At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($analysisHistory as $entry): ?>
+                                <tr class="border-b border-slate-100">
+                                    <td class="py-2 font-bold"><?php echo safe_output($entry["github_username"]); ?></td>
+                                    <td class="py-2"><?php echo safe_output($entry["total_repositories"]); ?></td>
+                                    <td class="py-2"><?php echo safe_output($entry["total_stars"]); ?></td>
+                                    <td class="py-2"><?php echo safe_output($entry["analyzed_at"]); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
                 <h3 class="text-xl font-extrabold">Account Protection Details</h3>
                 <p class="text-sm text-slate-500 mt-1">
                     This section proves that the dashboard is protected by PHP session data.
