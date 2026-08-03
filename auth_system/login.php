@@ -25,21 +25,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif (strlen($password) < 8) {
         $error_message = "Security policy requires password to contain at least 8 characters.";
     } else {
-        $mock_user_email = "student@university.edu";
-        $mock_password_hash = password_hash("secureStudent123", PASSWORD_DEFAULT);
+        require_once __DIR__ . "/db_connect.php";
+        $pdo = skillproof_db();
 
-        if ($email === $mock_user_email && password_verify($password, $mock_password_hash)) {
+        $stmt = $pdo->prepare("SELECT user_id, full_name, email, password_hash, role FROM users WHERE email = ? LIMIT 1");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user["password_hash"])) {
             session_regenerate_id(true);
-
-            $_SESSION["user_email"] = $email;
-            $_SESSION["user_role"] = "Developer";
-            $_SESSION["login_time"] = time();
+            $_SESSION["user_email"]    = $user["email"];
+            $_SESSION["user_role"]     = $user["role"];
+            $_SESSION["login_time"]    = time();
             $_SESSION["last_activity"] = time();
 
             header("Location: dashboard.php");
             exit();
         } else {
             $error_message = "Invalid credential combination. Please try again.";
+
         }
     }
 }
