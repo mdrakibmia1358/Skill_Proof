@@ -38,8 +38,8 @@ $is_logged_in = isset($_SESSION["user_email"]);
                 <a href="home.php" class="text-white font-semibold">Home</a>
                 <a href="#features" class="text-slate-300 hover:text-white">Features</a>
                 <a href="#process" class="text-slate-300 hover:text-white">How It Works</a>
-                <a href="skills.html" class="text-slate-300 hover:text-white">Skills</a>
-                <a href="recruiter.html" class="text-slate-300 hover:text-white">Recruiters</a>
+                <a href="skills.php" class="text-slate-300 hover:text-white">Skills</a>
+                <a href="recruiter.php" class="text-slate-300 hover:text-white">Recruiters</a>
                 <?php if ($is_logged_in): ?>
                     <a href="auth_system/dashboard.php" class="text-slate-300 hover:text-white">Dashboard</a>
                     <a
@@ -49,7 +49,7 @@ $is_logged_in = isset($_SESSION["user_email"]);
                         Logout
                     </a>
                 <?php else: ?>
-                    <a href="register.html" class="text-slate-300 hover:text-white">Sign Up</a>
+                    <a href="http://localhost/auth_system/register.php" class="text-slate-300 hover:text-white">Sign Up</a>
                     <a
                         href="http://localhost/auth_system/login.php"
                         class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition"
@@ -73,13 +73,13 @@ $is_logged_in = isset($_SESSION["user_email"]);
             <a href="home.php" class="block py-2 text-white font-semibold">Home</a>
             <a href="#features" class="block py-2 text-slate-300">Features</a>
             <a href="#process" class="block py-2 text-slate-300">How It Works</a>
-            <a href="skills.html" class="block py-2 text-slate-300">Skills</a>
-            <a href="recruiter.html" class="block py-2 text-slate-300">Recruiters</a>
+            <a href="skills.php" class="block py-2 text-slate-300">Skills</a>
+            <a href="recruiter.php" class="block py-2 text-slate-300">Recruiters</a>
             <?php if ($is_logged_in): ?>
                 <a href="auth_system/dashboard.php" class="block py-2 text-slate-300">Dashboard</a>
                 <a href="auth_system/logout.php" class="block py-2 text-red-300 font-bold">Logout</a>
             <?php else: ?>
-                <a href="register.html" class="block py-2 text-slate-300">Sign Up</a>
+                <a href="http://localhost/auth_system/register.php" class="block py-2 text-slate-300">Sign Up</a>
                 <a href="http://localhost/auth_system/login.php" class="block py-2 text-blue-300 font-bold">Login</a>
             <?php endif; ?>
         </div>
@@ -129,7 +129,7 @@ $is_logged_in = isset($_SESSION["user_email"]);
                         </a>
 
                         <a
-                            href="register.html"
+                            href="http://localhost/auth_system/register.php"
                             class="bg-white text-blue-950 px-7 py-3 rounded-xl font-bold hover:bg-blue-50 transition"
                         >
                             Create Account
@@ -403,7 +403,7 @@ $is_logged_in = isset($_SESSION["user_email"]);
                     </a>
 
                     <a
-                        href="register.html"
+                        href="http://localhost/auth_system/register.php"
                         class="bg-white text-slate-950 px-7 py-3 rounded-xl font-bold hover:bg-slate-100 transition"
                     >
                         Sign Up
@@ -420,8 +420,8 @@ $is_logged_in = isset($_SESSION["user_email"]);
 
             <div class="flex gap-5">
                 <a href="home.php" class="hover:text-white">Home</a>
-                <a href="skills.html" class="hover:text-white">Skills</a>
-                <a href="recruiter.html" class="hover:text-white">Recruiter</a>
+                <a href="skills.php" class="hover:text-white">Skills</a>
+                <a href="recruiter.php" class="hover:text-white">Recruiter</a>
                 <?php if ($is_logged_in): ?>
                     <a href="auth_system/dashboard.php" class="hover:text-white">Dashboard</a>
                 <?php else: ?>
