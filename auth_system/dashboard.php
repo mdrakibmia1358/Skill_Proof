@@ -163,7 +163,7 @@ $masked_session_id = session_id() !== ""
         </div>
 
         <nav class="p-4 space-y-2 text-sm">
-            <a href="../home.html" class="block px-4 py-3 rounded-lg hover:bg-slate-800 mb-2 border-b border-slate-800 pb-4">
+            <a href="../home.php" class="block px-4 py-3 rounded-lg hover:bg-slate-800 mb-2 border-b border-slate-800 pb-4">
                 &larr; Back to Home
             </a>
             <a href="#dashboard" class="block px-4 py-3 rounded-lg bg-blue-600 font-bold">Dashboard</a>
