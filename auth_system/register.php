@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <header class="bg-slate-950 text-white sticky top-0 z-50 shadow-lg">
         <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-            <a href="http://127.0.0.1:5500/home.html" class="flex items-center gap-3">
+            <a href="http://localhost/home.php" class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
                     <span class="text-white font-extrabold text-lg">SP</span>
                 </div>
@@ -104,9 +104,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </a>
 
             <div class="hidden md:flex items-center gap-8 text-sm">
-                <a href="http://127.0.0.1:5500/home.html" class="text-slate-300 hover:text-white">Home</a>
-                <a href="http://127.0.0.1:5500/skills.html" class="text-slate-300 hover:text-white">Skills</a>
-                <a href="http://127.0.0.1:5500/recruiter.html" class="text-slate-300 hover:text-white">Recruiters</a>
+                <a href="http://localhost/home.php" class="text-slate-300 hover:text-white">Home</a>
+                <a href="http://localhost/skills.php" class="text-slate-300 hover:text-white">Skills</a>
+                <a href="http://localhost/recruiter.php" class="text-slate-300 hover:text-white">Recruiters</a>
                 <a href="register.php" class="text-white font-semibold">Sign Up</a>
 
                 <a

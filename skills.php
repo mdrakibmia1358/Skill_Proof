@@ -1,0 +1,381 @@
+<?php
+session_start();
+$is_logged_in = isset($_SESSION["user_email"]);
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillProof - Verified Skills</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+    <!-- Navigation -->
+    <header class="bg-slate-950 text-white sticky top-0 z-50 shadow-lg">
+        <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+            <a href="home.php" class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
+                    <span class="text-white font-extrabold text-lg">SP</span>
+                </div>
+
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-wide leading-none">SkillProof</h1>
+                    <p class="text-[11px] text-slate-400 mt-1">Developer Assessment</p>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 text-sm">
+                <a href="home.php" class="text-slate-300 hover:text-white">Home</a>
+                <a href="home.php#features" class="text-slate-300 hover:text-white">Features</a>
+                <a href="home.php#process" class="text-slate-300 hover:text-white">How It Works</a>
+                <a href="skills.php" class="text-white font-semibold">Skills</a>
+                <a href="recruiter.php" class="text-slate-300 hover:text-white">Recruiters</a>
+                <?php if ($is_logged_in): ?>
+                    <a href="auth_system/dashboard.php" class="text-slate-300 hover:text-white">Dashboard</a>
+                    <a
+                        href="auth_system/logout.php"
+                        class="bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold transition"
+                    >
+                        Logout
+                    </a>
+                <?php else: ?>
+                    <a href="http://localhost/auth_system/register.php" class="text-slate-300 hover:text-white">Sign Up</a>
+                    <a
+                        href="http://localhost/auth_system/login.php"
+                        class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition"
+                    >
+                        Login
+                    </a>
+                <?php endif; ?>
+            </div>
+
+            <button id="menuButton" class="md:hidden bg-slate-800 px-3 py-2 rounded-lg text-sm">
+                Menu
+            </button>
+        </nav>
+
+        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 px-6 pb-4 space-y-2 text-sm">
+            <a href="home.php" class="block py-2 text-slate-300">Home</a>
+            <a href="home.php#features" class="block py-2 text-slate-300">Features</a>
+            <a href="home.php#process" class="block py-2 text-slate-300">How It Works</a>
+            <a href="skills.php" class="block py-2 text-white font-semibold">Skills</a>
+            <a href="recruiter.php" class="block py-2 text-slate-300">Recruiters</a>
+            <?php if ($is_logged_in): ?>
+                <a href="auth_system/dashboard.php" class="block py-2 text-slate-300">Dashboard</a>
+                <a href="auth_system/logout.php" class="block py-2 text-red-300 font-bold">Logout</a>
+            <?php else: ?>
+                <a href="http://localhost/auth_system/register.php" class="block py-2 text-slate-300">Sign Up</a>
+                <a href="http://localhost/auth_system/login.php" class="block py-2 text-blue-300 font-bold">Login</a>
+            <?php endif; ?>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+
+            <div>
+                <span class="inline-block bg-white/10 border border-white/10 rounded-full px-4 py-2 text-sm text-blue-100 mb-6">
+                    Verified Skill Analysis
+                </span>
+
+                <h2 class="text-4xl md:text-5xl font-extrabold leading-tight">
+                    Measure developer skills using real project evidence.
+                </h2>
+
+                <p class="mt-6 text-slate-300 leading-8 max-w-2xl">
+                    SkillProof reviews evidence such as repositories, project structure, commit history,
+                    technical implementation, and documentation quality to build a trusted skill profile.
+                </p>
+
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <?php if ($is_logged_in): ?>
+                        <a
+                            href="auth_system/dashboard.php"
+                            class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
+                        >
+                            Submit Skill
+                        </a>
+
+                        <a
+                            href="auth_system/dashboard.php"
+                            class="bg-white text-blue-950 px-7 py-3 rounded-xl font-bold hover:bg-blue-50 transition"
+                        >
+                            View Dashboard
+                        </a>
+                    <?php else: ?>
+                        <a
+                            href="http://localhost/auth_system/register.php"
+                            class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
+                        >
+                            Submit Skill
+                        </a>
+
+                        <a
+                            href="http://localhost/auth_system/login.php"
+                            class="bg-white text-blue-950 px-7 py-3 rounded-xl font-bold hover:bg-blue-50 transition"
+                        >
+                            View Dashboard
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="bg-white text-slate-800 rounded-3xl p-8 shadow-2xl border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-2xl font-extrabold text-slate-900">Skill Summary</h3>
+                        <p class="text-sm text-slate-500 mt-1">Evidence-backed technical profile</p>
+                    </div>
+
+                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                        Active
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mt-8">
+                    <div class="bg-slate-50 rounded-2xl border p-4">
+                        <p class="text-3xl font-extrabold text-blue-900">12</p>
+                        <p class="text-xs text-slate-500 mt-1">Skills Verified</p>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl border p-4">
+                        <p class="text-3xl font-extrabold text-blue-900">24</p>
+                        <p class="text-xs text-slate-500 mt-1">Repositories</p>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl border p-4">
+                        <p class="text-3xl font-extrabold text-blue-900">82%</p>
+                        <p class="text-xs text-slate-500 mt-1">Average Score</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skill Cards -->
+    <main class="max-w-7xl mx-auto px-6 py-16">
+
+        <div class="text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">
+                Technical Skill Scores
+            </h2>
+
+            <p class="mt-4 text-slate-500">
+                Each score is calculated from practical evidence such as code quality,
+                project structure, commit consistency, and documentation.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold">HTML & CSS</h3>
+                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Advanced</span>
+                </div>
+
+                <div class="mt-5 h-2 bg-slate-200 rounded-full">
+                    <div class="h-2 bg-green-500 rounded-full w-[90%]"></div>
+                </div>
+
+                <p class="mt-4 font-bold">Score: 90%</p>
+                <p class="text-sm text-slate-500 mt-2">
+                    Evidence: Responsive layout, semantic HTML, Flexbox, and CSS grid usage.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold">JavaScript</h3>
+                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">Intermediate</span>
+                </div>
+
+                <div class="mt-5 h-2 bg-slate-200 rounded-full">
+                    <div class="h-2 bg-blue-600 rounded-full w-[76%]"></div>
+                </div>
+
+                <p class="mt-4 font-bold">Score: 76%</p>
+                <p class="text-sm text-slate-500 mt-2">
+                    Evidence: DOM interaction, email validation, password strength, and UI behavior.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold">PHP</h3>
+                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Strong</span>
+                </div>
+
+                <div class="mt-5 h-2 bg-slate-200 rounded-full">
+                    <div class="h-2 bg-green-500 rounded-full w-[84%]"></div>
+                </div>
+
+                <p class="mt-4 font-bold">Score: 84%</p>
+                <p class="text-sm text-slate-500 mt-2">
+                    Evidence: Form handling, backend validation, session login, and protected dashboard.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold">SQL</h3>
+                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">Developing</span>
+                </div>
+
+                <div class="mt-5 h-2 bg-slate-200 rounded-full">
+                    <div class="h-2 bg-yellow-500 rounded-full w-[72%]"></div>
+                </div>
+
+                <p class="mt-4 font-bold">Score: 72%</p>
+                <p class="text-sm text-slate-500 mt-2">
+                    Evidence: Database schema planning, relational design, and query preparation.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold">Git & GitHub</h3>
+                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Strong</span>
+                </div>
+
+                <div class="mt-5 h-2 bg-slate-200 rounded-full">
+                    <div class="h-2 bg-green-500 rounded-full w-[88%]"></div>
+                </div>
+
+                <p class="mt-4 font-bold">Score: 88%</p>
+                <p class="text-sm text-slate-500 mt-2">
+                    Evidence: Branching, commits, pull requests, merges, and conflict resolution.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold">Documentation</h3>
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Good</span>
+                </div>
+
+                <div class="mt-5 h-2 bg-slate-200 rounded-full">
+                    <div class="h-2 bg-blue-600 rounded-full w-[78%]"></div>
+                </div>
+
+                <p class="mt-4 font-bold">Score: 78%</p>
+                <p class="text-sm text-slate-500 mt-2">
+                    Evidence: README quality, project explanation, screenshots, and file organization.
+                </p>
+            </div>
+        </div>
+
+        <!-- Evidence Table -->
+        <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mt-12">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold tracking-widest text-blue-600 uppercase">
+                        GitHub Evidence
+                    </span>
+
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-2">
+                        Skill Verification Evidence
+                    </h2>
+
+                    <p class="text-slate-500 mt-2">
+                        SkillProof does not depend only on self-reported CV skills. It connects
+                        claimed skills with real project evidence.
+                    </p>
+                </div>
+
+                <a
+                    href="<?php echo $is_logged_in ? 'auth_system/dashboard.php' : 'http://localhost/auth_system/register.php'; ?>"
+                    class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-bold text-sm"
+                >
+                    Submit Evidence
+                </a>
+            </div>
+
+            <div class="overflow-x-auto mt-8">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
+                        <tr>
+                            <th class="text-left px-4 py-3">Skill</th>
+                            <th class="text-left px-4 py-3">Evidence Source</th>
+                            <th class="text-left px-4 py-3">Score</th>
+                            <th class="text-left px-4 py-3">Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-slate-100">
+                        <tr>
+                            <td class="px-4 py-4 font-semibold">HTML / CSS</td>
+                            <td class="px-4 py-4 text-slate-600">Frontend files, semantic structure, responsive layout</td>
+                            <td class="px-4 py-4 font-semibold">90%</td>
+                            <td class="px-4 py-4">
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Verified</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="px-4 py-4 font-semibold">Git & GitHub</td>
+                            <td class="px-4 py-4 text-slate-600">Commits, branches, pull requests, merge history</td>
+                            <td class="px-4 py-4 font-semibold">88%</td>
+                            <td class="px-4 py-4">
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Verified</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="px-4 py-4 font-semibold">PHP</td>
+                            <td class="px-4 py-4 text-slate-600">Backend files and server-side project structure</td>
+                            <td class="px-4 py-4 font-semibold">84%</td>
+                            <td class="px-4 py-4">
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Verified</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="px-4 py-4 font-semibold">SQL</td>
+                            <td class="px-4 py-4 text-slate-600">Database schema and query evidence</td>
+                            <td class="px-4 py-4 font-semibold">72%</td>
+                            <td class="px-4 py-4">
+                                <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">Needs Review</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 text-slate-400 py-8">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-4 text-sm">
+            <p>© 2026 SkillProof. Evidence-Based Developer Assessment Platform.</p>
+
+            <div class="flex gap-5">
+                <a href="home.php" class="hover:text-white">Home</a>
+                <a href="recruiter.php" class="hover:text-white">Recruiters</a>
+                <?php if ($is_logged_in): ?>
+                    <a href="auth_system/dashboard.php" class="hover:text-white">Dashboard</a>
+                <?php else: ?>
+                    <a href="http://localhost/auth_system/register.php" class="hover:text-white">Sign Up</a>
+                    <a href="http://localhost/auth_system/login.php" class="hover:text-white">Login</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const menuButton = document.getElementById("menuButton");
+        const mobileMenu = document.getElementById("mobileMenu");
+
+        menuButton.addEventListener("click", function () {
+            mobileMenu.classList.toggle("hidden");
+        });
+    </script>
+
+</body>
+</html>
