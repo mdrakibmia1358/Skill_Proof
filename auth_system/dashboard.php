@@ -73,6 +73,74 @@ $readme_count = $repoStats["readme_count"] ?? 0;
 $masked_session_id = session_id() !== ""
     ? substr(session_id(), 0, 8) . "••••••••"
     : "Unavailable";
+    require_once __DIR__ . "/db_connect.php";
+    $pdo = skillproof_db();
+
+    $userLookup = $pdo->prepare("SELECT user_id FROM users WHERE email = ? LIMIT 1");
+    $userLookup->execute([$user_email]);
+    $userRow = $userLookup->fetch();
+    $current_user_id = $userRow ? (int) $userRow["user_id"] : null;
+
+    if ($current_user_id && $github_connected && empty($github_error)) {
+        $insertAnalysis = $pdo->prepare(
+            "INSERT INTO skill_analyses
+                (user_id, github_username, total_repositories, original_repositories,
+                forked_repositories, total_stars, total_forks, languages_detected, readme_count)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        );    
+        $insertAnalysis->execute([
+            $current_user_id, $github_username, $total_repositories, $original_repositories,
+            $forked_repositories, $total_stars, $total_forks, $languages_detected, $readme_count
+        ]);
+        $newAnalysisId = (int) $pdo->lastInsertId();
+
+        $insertSkill = $pdo->prepare(
+            "INSERT INTO skill_scores (analysis_id, skill_name, score, level, evidence, status) VALUES (?, ?, ?, ?, ?, ?)"
+        );
+        foreach ($skills as $skill) {
+            $insertSkill->execute([
+                $newAnalysisId,
+                $skill["name"] ?? "",
+                $skill["score"] ?? 0,
+                $skill["level"] ?? "",
+                $skill["evidence"] ?? "",
+                $skill["status"] ?? "Not Detected",
+            ]);
+        }   
+        $insertDimension = $pdo->prepare(
+            "INSERT INTO dimension_scores (analysis_id, dimension_name, score, evidence) VALUES (?, ?, ?, ?)"
+        );
+        foreach ($dimensions as $dimension) {
+            $insertDimension->execute([
+                $newAnalysisId,
+                $dimension["name"] ?? "",
+                $dimension["score"] ?? 0,
+                $dimension["evidence"] ?? "",
+            ]);
+        }
+
+        $insertGap = $pdo->prepare(
+            "INSERT INTO learning_gaps (analysis_id, title, description, priority) VALUES (?, ?, ?, ?)"
+        );
+        foreach ($learningGaps as $gap) {
+            $insertGap->execute([
+                $newAnalysisId,
+                $gap["title"] ?? "",
+                $gap["text"] ?? ($gap["description"] ?? ""),
+                $gap["priority"] ?? "Low Priority",
+            ]);
+        }
+    }
+
+    $analysisHistory = [];
+    if ($current_user_id) {
+        $historyStmt = $pdo->prepare(
+            "SELECT github_username, total_repositories, total_stars, analyzed_at
+            FROM skill_analyses WHERE user_id = ? ORDER BY analyzed_at DESC LIMIT 5"
+        );
+        $historyStmt->execute([$current_user_id]);
+        $analysisHistory = $historyStmt->fetchAll();
+    }             
 ?>
 
 <!DOCTYPE html>
@@ -341,9 +409,8 @@ $masked_session_id = session_id() !== ""
                     <?php endforeach; ?>
                 </div>
             </div>
-
-            <div id="security" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-                <div id="history" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            
+            <div id="history" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 <p class="text-xs uppercase tracking-widest text-blue-700 font-extrabold">Analysis History</p>
                 <h3 class="text-xl font-extrabold mt-1">Past GitHub Analysis Runs</h3>
                 <p class="text-sm text-slate-500 mb-4">Your last 5 analysis runs saved to the database.</p>
@@ -372,6 +439,9 @@ $masked_session_id = session_id() !== ""
                     </table>
                 <?php endif; ?>
             </div>
+
+
+            <div id="security" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 <h3 class="text-xl font-extrabold">Account Protection Details</h3>
                 <p class="text-sm text-slate-500 mt-1">
                     This section proves that the dashboard is protected by PHP session data.
