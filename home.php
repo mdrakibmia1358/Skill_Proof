@@ -1,3 +1,7 @@
+<?php
+session_start();
+$is_logged_in = isset($_SESSION["user_email"]);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +18,7 @@
         <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
             <!-- Logo -->
-            <a href="home.html" class="flex items-center gap-3">
+            <a href="home.php" class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
                     <span class="text-white font-extrabold text-lg">SP</span>
                 </div>
@@ -31,19 +35,28 @@
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center gap-8 text-sm">
-                <a href="home.html" class="text-white font-semibold">Home</a>
+                <a href="home.php" class="text-white font-semibold">Home</a>
                 <a href="#features" class="text-slate-300 hover:text-white">Features</a>
                 <a href="#process" class="text-slate-300 hover:text-white">How It Works</a>
                 <a href="skills.html" class="text-slate-300 hover:text-white">Skills</a>
                 <a href="recruiter.html" class="text-slate-300 hover:text-white">Recruiters</a>
-                <a href="register.html" class="text-slate-300 hover:text-white">Sign Up</a>
-
-                <a
-                    href="http://localhost/auth_system/login.php"
-                    class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition"
-                >
-                    Login
-                </a>
+                <?php if ($is_logged_in): ?>
+                    <a href="auth_system/dashboard.php" class="text-slate-300 hover:text-white">Dashboard</a>
+                    <a
+                        href="auth_system/logout.php"
+                        class="bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold transition"
+                    >
+                        Logout
+                    </a>
+                <?php else: ?>
+                    <a href="register.html" class="text-slate-300 hover:text-white">Sign Up</a>
+                    <a
+                        href="http://localhost/auth_system/login.php"
+                        class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition"
+                    >
+                        Login
+                    </a>
+                <?php endif; ?>
             </div>
 
             <!-- Mobile Menu Button -->
@@ -57,13 +70,18 @@
 
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 px-6 pb-4 space-y-2 text-sm">
-            <a href="home.html" class="block py-2 text-white font-semibold">Home</a>
+            <a href="home.php" class="block py-2 text-white font-semibold">Home</a>
             <a href="#features" class="block py-2 text-slate-300">Features</a>
             <a href="#process" class="block py-2 text-slate-300">How It Works</a>
             <a href="skills.html" class="block py-2 text-slate-300">Skills</a>
             <a href="recruiter.html" class="block py-2 text-slate-300">Recruiters</a>
-            <a href="register.html" class="block py-2 text-slate-300">Sign Up</a>
-            <a href="http://localhost/auth_system/login.php" class="block py-2 text-blue-300 font-bold">Login</a>
+            <?php if ($is_logged_in): ?>
+                <a href="auth_system/dashboard.php" class="block py-2 text-slate-300">Dashboard</a>
+                <a href="auth_system/logout.php" class="block py-2 text-red-300 font-bold">Logout</a>
+            <?php else: ?>
+                <a href="register.html" class="block py-2 text-slate-300">Sign Up</a>
+                <a href="http://localhost/auth_system/login.php" class="block py-2 text-blue-300 font-bold">Login</a>
+            <?php endif; ?>
         </div>
     </header>
 
@@ -88,19 +106,35 @@
                 </p>
 
                 <div class="mt-8 flex flex-wrap gap-4">
-                    <a
-                        href="http://localhost/auth_system/login.php"
-                        class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold shadow-lg shadow-blue-900/30 transition"
-                    >
-                        Login to Dashboard
-                    </a>
+                    <?php if ($is_logged_in): ?>
+                        <a
+                            href="auth_system/dashboard.php"
+                            class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold shadow-lg shadow-blue-900/30 transition"
+                        >
+                            Go to Dashboard
+                        </a>
 
-                    <a
-                        href="register.html"
-                        class="bg-white text-blue-950 px-7 py-3 rounded-xl font-bold hover:bg-blue-50 transition"
-                    >
-                        Create Account
-                    </a>
+                        <a
+                            href="auth_system/logout.php"
+                            class="bg-white text-blue-950 px-7 py-3 rounded-xl font-bold hover:bg-blue-50 transition"
+                        >
+                            Logout
+                        </a>
+                    <?php else: ?>
+                        <a
+                            href="http://localhost/auth_system/login.php"
+                            class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold shadow-lg shadow-blue-900/30 transition"
+                        >
+                            Login to Dashboard
+                        </a>
+
+                        <a
+                            href="register.html"
+                            class="bg-white text-blue-950 px-7 py-3 rounded-xl font-bold hover:bg-blue-50 transition"
+                        >
+                            Create Account
+                        </a>
+                    <?php endif; ?>
                 </div>
 
                 <div class="grid grid-cols-3 gap-4 mt-10 max-w-xl">
@@ -346,19 +380,35 @@
             </p>
 
             <div class="mt-8 flex justify-center gap-4 flex-wrap">
-                <a
-                    href="http://localhost/auth_system/login.php"
-                    class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
-                >
-                    Login
-                </a>
+                <?php if ($is_logged_in): ?>
+                    <a
+                        href="auth_system/dashboard.php"
+                        class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
+                    >
+                        Go to Dashboard
+                    </a>
 
-                <a
-                    href="register.html"
-                    class="bg-white text-slate-950 px-7 py-3 rounded-xl font-bold hover:bg-slate-100 transition"
-                >
-                    Sign Up
-                </a>
+                    <a
+                        href="auth_system/logout.php"
+                        class="bg-white text-slate-950 px-7 py-3 rounded-xl font-bold hover:bg-slate-100 transition"
+                    >
+                        Logout
+                    </a>
+                <?php else: ?>
+                    <a
+                        href="http://localhost/auth_system/login.php"
+                        class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
+                    >
+                        Login
+                    </a>
+
+                    <a
+                        href="register.html"
+                        class="bg-white text-slate-950 px-7 py-3 rounded-xl font-bold hover:bg-slate-100 transition"
+                    >
+                        Sign Up
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -369,10 +419,14 @@
             <p>© 2026 SkillProof. Evidence-Based Developer Assessment Platform.</p>
 
             <div class="flex gap-5">
-                <a href="home.html" class="hover:text-white">Home</a>
+                <a href="home.php" class="hover:text-white">Home</a>
                 <a href="skills.html" class="hover:text-white">Skills</a>
                 <a href="recruiter.html" class="hover:text-white">Recruiter</a>
-                <a href="http://localhost/auth_system/login.php" class="hover:text-white">Login</a>
+                <?php if ($is_logged_in): ?>
+                    <a href="auth_system/dashboard.php" class="hover:text-white">Dashboard</a>
+                <?php else: ?>
+                    <a href="http://localhost/auth_system/login.php" class="hover:text-white">Login</a>
+                <?php endif; ?>
             </div>
         </div>
     </footer>

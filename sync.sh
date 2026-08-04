@@ -1,6 +1,8 @@
 #!/bin/bash
-sudo rm -rf /opt/lampp/htdocs/auth_system
-sudo mkdir -p /opt/lampp/htdocs/auth_system
-sudo cp -r auth_system/* /opt/lampp/htdocs/auth_system/
-sudo chmod -R 755 /opt/lampp/htdocs/auth_system
+sudo rsync -a --delete \
+    --exclude='.git' \
+    --exclude='auth_system_OLD_BACKUP' \
+    --exclude='sync.sh' \
+    ./ /opt/lampp/htdocs/
+sudo chmod -R 755 /opt/lampp/htdocs/
 echo "Synced ✓"
