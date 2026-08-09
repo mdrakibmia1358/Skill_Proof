@@ -1,6 +1,6 @@
 # Week 6 — Database Integration & Web Application Security: Proof of Work
 
-## Nondini — Login / SQL Injection Defense
+## 2. Nondini — Login / SQL Injection Defense
 **File(s):** `auth_system/login.php`
 **Branch:** `feature/week6-login-security-nondini`
 
@@ -26,3 +26,18 @@
 **Evidence:**
 ![bcrypt hash in phpMyAdmin](./screenshots/sumaiya-hash-proof.png)
 ![Duplicate email rejected](./screenshots/sumaiya-duplicate-email-proof.png)
+
+## 4. Maria — Profile Update / XSS Mitigation
+**File(s):** `auth_system/profile.php`
+**Branch:** `feature/week6-profile-xss-maria`
+
+- [x] Removed/disabled `ini_set('display_errors', 1)` and related debug output
+- [x] Confirmed all dynamic output passes through `htmlspecialchars(..., ENT_QUOTES, 'UTF-8')`
+- [x] Confirmed the bio `UPDATE` query uses parameter binding
+- [x] Tested payload `<script>alert('xss')</script>` in the bio field → rendered
+      as literal text, not executed
+- [x] Removed raw exception messages (`$e->getMessage()`) shown to the user;
+      replaced with `error_log()` + generic messages (prevents information disclosure)
+
+**Evidence:**
+![XSS payload neutralized](./screenshots/maria-xss-test.png)
