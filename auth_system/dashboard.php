@@ -173,6 +173,7 @@ $masked_session_id = session_id() !== ""
             <a href="#gaps" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Learning Gap</a>
             <a href="#history" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Analysis History</a>
             <a href="#security" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Account Security</a>
+            <a href="profile.php" class="block px-4 py-3 rounded-lg hover:bg-slate-800 border-t border-slate-800 mt-2 pt-4">My Profile</a>
         </nav>
 
         <div class="mt-auto p-4">
