@@ -1,8 +1,5 @@
 <?php
 // profile.php - Located inside 'auth_system' directory
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 session_start();
 
@@ -25,7 +22,8 @@ if (function_exists('skillproof_db')) {
 } elseif (isset($pdo)) {
     // Uses existing $pdo from db_connect.php
 } else {
-    die("Error: PDO connection variable not found in db_connect.php.");
+    error_log("SkillProof: PDO connection variable not found in db_connect.php.");
+    die("A system error occurred. Please try again later.");
 }
 
 // 4. Fetch Current User Data via Prepared Statement
@@ -35,12 +33,16 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
-        die("User record not found.");
+        error_log("SkillProof: User record not found for email: " . $user_email);
+        die("A system error occurred. Please try again later.");
     }
 
     $user_id = (int) $user['user_id'];
 } catch (PDOException $e) {
-    die("Database query error: " . $e->getMessage());
+    // Log the real error for developers; never expose raw exception
+    // details to the end user (prevents information disclosure).
+    error_log("SkillProof profile.php SELECT failed: " . $e->getMessage());
+    die("A system error occurred. Please try again later.");
 }
 
 // 5. Parameterized UPDATE Logic (SQL Injection Defense)
@@ -59,7 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user['bio'] = $bio;
         }
     } catch (PDOException $e) {
-        $error = "Failed to update profile: " . $e->getMessage();
+        // Log the real error for developers; show only a generic
+        // message to the user.
+        error_log("SkillProof profile.php UPDATE failed: " . $e->getMessage());
+        $error = "Failed to update profile. Please try again later.";
     }
 }
 ?>
