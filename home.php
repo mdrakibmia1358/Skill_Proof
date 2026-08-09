@@ -42,6 +42,7 @@ $is_logged_in = isset($_SESSION["user_email"]);
                 <a href="recruiter.php" class="text-slate-300 hover:text-white">Recruiters</a>
                 <?php if ($is_logged_in): ?>
                     <a href="auth_system/dashboard.php" class="text-slate-300 hover:text-white">Dashboard</a>
+                    <a href="auth_system/profile.php" class="text-slate-300 hover:text-white">Profile</a>
                     <a
                         href="auth_system/logout.php"
                         class="bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold transition"
@@ -77,6 +78,7 @@ $is_logged_in = isset($_SESSION["user_email"]);
             <a href="recruiter.php" class="block py-2 text-slate-300">Recruiters</a>
             <?php if ($is_logged_in): ?>
                 <a href="auth_system/dashboard.php" class="block py-2 text-slate-300">Dashboard</a>
+                <a href="auth_system/profile.php" class="block py-2 text-slate-300">Profile</a>
                 <a href="auth_system/logout.php" class="block py-2 text-red-300 font-bold">Logout</a>
             <?php else: ?>
                 <a href="http://localhost/auth_system/register.php" class="block py-2 text-slate-300">Sign Up</a>
