@@ -16,7 +16,9 @@ DROP TABLE IF EXISTS dimension_scores;
 DROP TABLE IF EXISTS skill_scores;
 DROP TABLE IF EXISTS skill_analyses;
 DROP TABLE IF EXISTS users;
-
+DROP TABLE IF EXISTS learning_gaps;
+DROP TABLE IF EXISTS recruiter_reports;
+DROP TABLE IF EXISTS dimension_scores;
 CREATE TABLE users (
     user_id         INT AUTO_INCREMENT PRIMARY KEY,
     full_name       VARCHAR(100)  NOT NULL,
@@ -39,6 +41,8 @@ CREATE TABLE skill_analyses (
     total_forks            INT DEFAULT 0,
     languages_detected     INT DEFAULT 0,
     readme_count           INT DEFAULT 0,
+    trust_score            TINYINT UNSIGNED DEFAULT 0,
+    career_score            TINYINT UNSIGNED DEFAULT 0,
     analyzed_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB;
@@ -61,6 +65,17 @@ CREATE TABLE dimension_scores (
     score          TINYINT UNSIGNED NOT NULL,
     evidence       VARCHAR(255) NOT NULL,
     FOREIGN KEY (analysis_id) REFERENCES skill_analyses(analysis_id) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE recruiter_reports (
+    report_id     INT AUTO_INCREMENT PRIMARY KEY,
+    recruiter_id  INT NOT NULL,
+    developer_id  INT NOT NULL,
+    analysis_id   INT NULL,
+    generated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (recruiter_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (developer_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (analysis_id) REFERENCES skill_analyses(analysis_id) ON DELETE SET NULL
 ) ENGINE = InnoDB;
 
 CREATE TABLE learning_gaps (

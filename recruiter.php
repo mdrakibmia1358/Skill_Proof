@@ -1,6 +1,7 @@
 <?php
 session_start();
 $is_logged_in = isset($_SESSION["user_email"]);
+$dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_system/recruiter_dashboard.php" : "auth_system/dashboard.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,7 +36,7 @@ $is_logged_in = isset($_SESSION["user_email"]);
                 <a href="skills.php" class="text-slate-300 hover:text-white">Skills</a>
                 <a href="recruiter.php" class="text-white font-semibold">Recruiters</a>
                 <?php if ($is_logged_in): ?>
-                    <a href="auth_system/dashboard.php" class="text-slate-300 hover:text-white">Dashboard</a>
+                    <a href="<?php echo $dashboard_link; ?>" class="text-slate-300 hover:text-white">Dashboard</a>
                     <a href="auth_system/profile.php" class="text-slate-300 hover:text-white">Profile</a>
                     <a
                         href="auth_system/logout.php"
@@ -66,7 +67,7 @@ $is_logged_in = isset($_SESSION["user_email"]);
             <a href="skills.php" class="block py-2 text-slate-300">Skills</a>
             <a href="recruiter.php" class="block py-2 text-white font-semibold">Recruiters</a>
             <?php if ($is_logged_in): ?>
-                <a href="auth_system/dashboard.php" class="block py-2 text-slate-300">Dashboard</a>
+                <a href="<?php echo $dashboard_link; ?>" class="block py-2 text-slate-300">Dashboard</a>
                 <a href="auth_system/profile.php" class="block py-2 text-slate-300">Profile</a>
                 <a href="auth_system/logout.php" class="block py-2 text-red-300 font-bold">Logout</a>
             <?php else: ?>
@@ -297,7 +298,7 @@ $is_logged_in = isset($_SESSION["user_email"]);
             <div class="mt-8 flex justify-center gap-4 flex-wrap">
                 <?php if ($is_logged_in): ?>
                     <a
-                        href="auth_system/dashboard.php"
+                        href="<?php echo $dashboard_link; ?>"
                         class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
                     >
                         Go to Dashboard
@@ -338,7 +339,7 @@ $is_logged_in = isset($_SESSION["user_email"]);
                 <a href="home.php" class="hover:text-white">Home</a>
                 <a href="skills.php" class="hover:text-white">Skills</a>
                 <?php if ($is_logged_in): ?>
-                    <a href="auth_system/dashboard.php" class="hover:text-white">Dashboard</a>
+                    <a href="<?php echo $dashboard_link; ?>" class="hover:text-white">Dashboard</a>
                 <?php else: ?>
                     <a href="http://localhost/auth_system/register.php" class="hover:text-white">Sign Up</a>
                     <a href="http://localhost/auth_system/login.php" class="hover:text-white">Login</a>

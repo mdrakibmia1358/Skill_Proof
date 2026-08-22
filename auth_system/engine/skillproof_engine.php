@@ -53,11 +53,27 @@ function sp_api_get($url) {
             ];
         }
 
-        if ($httpCode < 200 || $httpCode >= 300) {
+        if ($httpCode === 404) {
             return [
                 "ok" => false,
                 "data" => null,
                 "error" => "GitHub user or repository data not found."
+            ];
+        }
+
+        if ($httpCode === 403 || $httpCode === 429) {
+            return [
+                "ok" => false,
+                "data" => null,
+                "error" => "GitHub API rate limit reached. Please wait a few minutes and try again."
+            ];
+        }
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            return [
+                "ok" => false,
+                "data" => null,
+                "error" => "GitHub API request failed (HTTP " . $httpCode . "). Please try again later."
             ];
         }
 
@@ -103,11 +119,27 @@ function sp_api_get($url) {
         }
     }
 
-    if ($httpCode < 200 || $httpCode >= 300) {
+    if ($httpCode === 404) {
         return [
             "ok" => false,
             "data" => null,
             "error" => "GitHub user or repository data not found."
+        ];
+    }
+
+    if ($httpCode === 403 || $httpCode === 429) {
+        return [
+            "ok" => false,
+            "data" => null,
+            "error" => "GitHub API rate limit reached. Please wait a few minutes and try again."
+        ];
+    }
+
+    if ($httpCode < 200 || $httpCode >= 300) {
+        return [
+            "ok" => false,
+            "data" => null,
+            "error" => "GitHub API request failed (HTTP " . $httpCode . "). Please try again later."
         ];
     }
 

@@ -10,7 +10,7 @@ function safe_output($value) {
 }
 
 if (isset($_SESSION["user_email"])) {
-    header("Location: dashboard.php");
+    header("Location: " . (($_SESSION["user_role"] ?? "") === "Recruiter" ? "recruiter_dashboard.php" : "dashboard.php"));
     exit();
 }
 
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION["login_time"]    = time();
             $_SESSION["last_activity"] = time();
 
-            header("Location: dashboard.php");
+            header("Location: " . ($user["role"] === "Recruiter" ? "recruiter_dashboard.php" : "dashboard.php"));
             exit();
         } else {
             $error_message = "Invalid credential combination. Please try again.";
