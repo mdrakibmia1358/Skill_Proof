@@ -10,6 +10,11 @@ if (!isset($_SESSION["user_email"])) {
     exit();
 }
 
+if (($_SESSION["user_role"] ?? "") === "Recruiter") {
+    header("Location: recruiter_dashboard.php");
+    exit();
+}
+
 $timeout_duration = 300;
 
 if (
@@ -30,25 +35,21 @@ function safe_output($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8");
 }
 
+require_once __DIR__ . "/db_connect.php";
+$pdo = skillproof_db();
+
 $user_email = $_SESSION["user_email"];
 $user_role = $_SESSION["user_role"] ?? "Developer";
 $login_time = $_SESSION["login_time"] ?? time();
 
-$github_username = $_SESSION["github_username"] ?? "";
-
-if (
-    $_SERVER["REQUEST_METHOD"] === "POST" &&
-    isset($_POST["github_username"])
-) {
-    $github_username = trim($_POST["github_username"]);
-
-    if ($github_username === "") {
-        unset($_SESSION["github_username"]);
-        $github_username = "";
-    } else {
-        $_SESSION["github_username"] = $github_username;
-    }
-}
+// GitHub identity is locked to the account provided at registration.
+// A developer can re-sync (re-analyze) their own account, but cannot
+// point their profile at someone else's GitHub username.
+$userLookup = $pdo->prepare("SELECT user_id, github_username FROM users WHERE email = ? LIMIT 1");
+$userLookup->execute([$user_email]);
+$userRow = $userLookup->fetch();
+$current_user_id = $userRow ? (int) $userRow["user_id"] : null;
+$github_username = $userRow["github_username"] ?? "";
 
 $analysis = skillproof_analyze_github_user($github_username);
 
@@ -76,21 +77,21 @@ $masked_session_id = session_id() !== ""
     require_once __DIR__ . "/db_connect.php";
     $pdo = skillproof_db();
 
-    $userLookup = $pdo->prepare("SELECT user_id FROM users WHERE email = ? LIMIT 1");
-    $userLookup->execute([$user_email]);
-    $userRow = $userLookup->fetch();
-    $current_user_id = $userRow ? (int) $userRow["user_id"] : null;
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && $current_user_id && $github_connected && empty($github_error)) {
+        $trust_score = $analysis["scores"]["trust"] ?? 0;
+        $career_score = $analysis["scores"]["career"] ?? 0;
 
-    if ($current_user_id && $github_connected && empty($github_error)) {
         $insertAnalysis = $pdo->prepare(
             "INSERT INTO skill_analyses
                 (user_id, github_username, total_repositories, original_repositories,
-                forked_repositories, total_stars, total_forks, languages_detected, readme_count)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                forked_repositories, total_stars, total_forks, languages_detected, readme_count,
+                trust_score, career_score)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );    
         $insertAnalysis->execute([
             $current_user_id, $github_username, $total_repositories, $original_repositories,
-            $forked_repositories, $total_stars, $total_forks, $languages_detected, $readme_count
+            $forked_repositories, $total_stars, $total_forks, $languages_detected, $readme_count,
+            $trust_score, $career_score
         ]);
         $newAnalysisId = (int) $pdo->lastInsertId();
 
@@ -221,22 +222,32 @@ $masked_session_id = session_id() !== ""
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="dashboard.php#github" class="mt-5 flex flex-col md:flex-row gap-3">
-                    <input
-                        type="text"
-                        name="github_username"
-                        value="<?php echo safe_output($github_username); ?>"
-                        placeholder="Enter GitHub username"
-                        class="flex-1 px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    >
+                <?php if (empty($github_username)): ?>
+                    <div class="mt-4 bg-amber-50 border border-amber-300 text-amber-700 px-4 py-3 rounded-xl text-sm">
+                        No GitHub username is on file for your account. Please add one from
+                        <a href="profile.php" class="underline font-bold">My Profile</a> before syncing.
+                    </div>
+                <?php else: ?>
+                    <form method="POST" action="dashboard.php#github" class="mt-5 flex flex-col md:flex-row gap-3">
+                        <input
+                            type="text"
+                            value="<?php echo safe_output($github_username); ?>"
+                            readonly
+                            class="flex-1 px-4 py-3 border border-slate-200 bg-slate-100 text-slate-500 rounded-xl cursor-not-allowed"
+                        >
 
-                    <button
-                        type="submit"
-                        class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold"
-                    >
-                        Analyze GitHub
-                    </button>
-                </form>
+                        <button
+                            type="submit"
+                            class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold whitespace-nowrap"
+                        >
+                            Re-sync GitHub Data
+                        </button>
+                    </form>
+                    <p class="text-xs text-slate-400 mt-2">
+                        Locked to the GitHub account on your profile. To verify a different account,
+                        update it under <a href="profile.php" class="underline">My Profile</a> first.
+                    </p>
+                <?php endif; ?>
 
                 <div class="mt-4 text-sm">
                     <?php if ($github_connected): ?>
@@ -452,7 +463,7 @@ $masked_session_id = session_id() !== ""
                     <p><strong>User Email:</strong> <span class="text-blue-800 font-bold"><?php echo safe_output($user_email); ?></span></p>
                     <p><strong>GitHub Username:</strong> <?php echo $github_connected ? safe_output($github_username) : "Not Connected"; ?></p>
                     <p><strong>Account Status:</strong> <span class="text-green-700 font-bold">Active and Protected</span></p>
-                    <p><strong>Access Token:</strong> <code class="bg-white border px-2 py-1 rounded text-blue-800"><?php echo safe_output($masked_session_id); ?></code></p>
+                    <p><strong>Session ID (masked):</strong> <code class="bg-white border px-2 py-1 rounded text-blue-800"><?php echo safe_output($masked_session_id); ?></code></p>
                     <p><strong>Login Time:</strong> <?php echo date("Y-m-d H:i:s", $login_time); ?></p>
                     <p><strong>Auto Lock:</strong> Account automatically locks after 300 seconds of inactivity.</p>
                     <p><strong>Access Rule:</strong> Dashboard cannot be opened without login.</p>
