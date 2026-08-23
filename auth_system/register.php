@@ -1,11 +1,13 @@
 <?php
 session_start();
+require_once __DIR__ . "/csrf.php";
 
 $error_message = "";
 $full_name = "";
 $email = "";
 $github = "";
 $role = "Developer";
+$csrf_token = sp_csrf_token();
 
 function safe_output($value) {
     return htmlspecialchars($value, ENT_QUOTES, "UTF-8");
@@ -16,7 +18,9 @@ if (isset($_SESSION["user_email"])) {
     exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"] ?? "")) {
+    $error_message = "Your session expired. Please try registering again.";
+} elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     require_once __DIR__ . "/db_connect.php";
 
     $full_name = trim($_POST["fullName"] ?? "");
@@ -222,6 +226,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <?php endif; ?>
 
                 <form id="registerForm" action="register.php" method="POST" class="space-y-5" novalidate>
+                    <input type="hidden" name="csrf_token" value="<?php echo safe_output($csrf_token); ?>">
 
                     <div>
                         <label for="fullName" class="block text-sm font-bold text-slate-700 mb-2">

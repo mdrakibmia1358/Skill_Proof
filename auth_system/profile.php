@@ -2,6 +2,7 @@
 // profile.php - Located inside 'auth_system' directory
 
 session_start();
+require_once __DIR__ . '/csrf.php';
 
 // 1. Correct relative path to db_connect.php inside auth_system
 require_once 'db_connect.php';
@@ -15,6 +16,7 @@ if (!isset($_SESSION['user_email'])) {
 $user_email = $_SESSION['user_email'];
 $message = "";
 $error = "";
+$csrf_token = sp_csrf_token();
 
 // 3. Obtain PDO connection
 if (function_exists('skillproof_db')) {
@@ -74,7 +76,9 @@ if (($user['role'] ?? '') === 'Developer') {
 }
 
 // 5. Parameterized UPDATE Logic (SQL Injection Defense)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'] ?? '')) {
+    $error = "Your session expired. Please try saving again.";
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bio = trim($_POST['bio'] ?? '');
     $github_username = trim($_POST['github_username'] ?? $user['github_username']);
 
@@ -98,6 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     : "Profile bio updated successfully!";
             }
         } catch (PDOException $e) {
+            // Log the real error for developers; show only a generic
+            // message to the user.
             error_log("SkillProof profile.php UPDATE failed: " . $e->getMessage());
             $error = "Failed to update profile. Please try again later.";
         }
@@ -188,6 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Profile Form -->
                 <div class="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 lg:p-8 shadow-2xl backdrop-blur-sm">
                     <form action="profile.php" method="POST" class="space-y-5">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Full Name</label>
                             <input type="text" disabled 
