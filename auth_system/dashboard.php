@@ -30,10 +30,13 @@ if (
 $_SESSION["last_activity"] = time();
 
 require_once __DIR__ . "/engine/skillproof_engine.php";
+require_once __DIR__ . "/csrf.php";
 
 function safe_output($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8");
 }
+
+$csrf_token = sp_csrf_token();
 
 require_once __DIR__ . "/db_connect.php";
 $pdo = skillproof_db();
@@ -77,7 +80,7 @@ $masked_session_id = session_id() !== ""
     require_once __DIR__ . "/db_connect.php";
     $pdo = skillproof_db();
 
-    if ($_SERVER["REQUEST_METHOD"] === "POST" && $current_user_id && $github_connected && empty($github_error)) {
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && sp_csrf_verify($_POST["csrf_token"] ?? "") && $current_user_id && $github_connected && empty($github_error)) {
         $trust_score = $analysis["scores"]["trust"] ?? 0;
         $career_score = $analysis["scores"]["career"] ?? 0;
 
@@ -229,6 +232,7 @@ $masked_session_id = session_id() !== ""
                     </div>
                 <?php else: ?>
                     <form method="POST" action="dashboard.php#github" class="mt-5 flex flex-col md:flex-row gap-3">
+                        <input type="hidden" name="csrf_token" value="<?php echo safe_output($csrf_token); ?>">
                         <input
                             type="text"
                             value="<?php echo safe_output($github_username); ?>"
