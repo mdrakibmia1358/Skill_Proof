@@ -150,6 +150,77 @@ function sp_api_get($url) {
     ];
 }
 
+// FR-6: Career Fit Analysis
+// Finds the highest skill score among a set of named skills (e.g. the best
+// of several backend languages), so a role match isn't penalized for having
+// many low-scoring languages alongside one strong one.
+function sp_best_skill_score($skills, $names) {
+    $best = 0;
+    foreach ($skills as $skill) {
+        if (in_array($skill["name"], $names, true) && ($skill["score"] ?? 0) > $best) {
+            $best = $skill["score"];
+        }
+    }
+    return $best;
+}
+
+// Computes a 0-100 match percentage against four predefined career roles,
+// using the developer's verified skill scores and dimension scores as
+// evidence. Returns roles sorted with the best fit first.
+function sp_calculate_career_fit($skills, $scores) {
+    $frontendLangs = ["JavaScript", "TypeScript", "HTML", "CSS", "Vue", "Svelte"];
+    $backendLangs  = ["Python", "Java", "PHP", "Go", "Ruby", "C#", "Rust", "Kotlin", "Scala", "C++", "C", "JavaScript", "TypeScript"];
+
+    $bestFrontend = sp_best_skill_score($skills, $frontendLangs);
+    $bestBackend  = sp_best_skill_score($skills, $backendLangs);
+    $sqlScore     = sp_best_skill_score($skills, ["SQL"]);
+    $gitScore     = sp_best_skill_score($skills, ["Git & GitHub"]);
+    $devopsScore  = $scores["devops"] ?? 0;
+    $securityScore = $scores["security"] ?? 0;
+    $docScore     = $scores["documentation"] ?? 0;
+    $complexity   = $scores["complexity"] ?? 0;
+    $professionalism = $scores["professionalism"] ?? 0;
+    $testing      = $scores["testing"] ?? 0;
+    $trust        = $scores["trust"] ?? 0;
+
+    $backendMatch = sp_score_limit(
+        ($bestBackend * 0.45) + ($sqlScore * 0.20) + ($devopsScore * 0.15) +
+        ($securityScore * 0.10) + ($gitScore * 0.10)
+    );
+
+    // Rewards having BOTH frontend and backend evidence (averaging punishes
+    // a developer who is strong in only one side), plus supporting signals.
+    $fullStackMatch = sp_score_limit(
+        ((($bestFrontend + $bestBackend) / 2) * 0.55) + ($sqlScore * 0.15) +
+        ($docScore * 0.15) + ($gitScore * 0.15)
+    );
+
+    $databaseMatch = sp_score_limit(
+        ($sqlScore * 0.55) + ($bestBackend * 0.20) + ($docScore * 0.15) + ($securityScore * 0.10)
+    );
+
+    // Deliberately language-agnostic: a generalist "Software Engineer" fit
+    // is driven by overall engineering practice rather than any one stack.
+    $softwareEngineerMatch = sp_score_limit(
+        ($trust * 0.30) + ($complexity * 0.20) + ($professionalism * 0.20) +
+        ($testing * 0.15) + ($docScore * 0.15)
+    );
+
+    $roles = [
+        ["role" => "Backend Developer", "match" => $backendMatch],
+        ["role" => "Full Stack Developer", "match" => $fullStackMatch],
+        ["role" => "Database Developer", "match" => $databaseMatch],
+        ["role" => "Software Engineer", "match" => $softwareEngineerMatch],
+    ];
+
+    usort($roles, function ($a, $b) {
+        if ($b["match"] === $a["match"]) return strcmp($a["role"], $b["role"]);
+        return $b["match"] <=> $a["match"];
+    });
+
+    return $roles;
+}
+
 function sp_skill_level($score) {
     if ($score >= 85) return "Strong";
     if ($score >= 70) return "Good";
@@ -279,6 +350,7 @@ function sp_build_result($data) {
         "summaryCards" => $summaryCards,
         "skills" => $skills,
         "dimensions" => $dimensions,
+        "careerFit" => sp_calculate_career_fit($skills, $scores),
         "learningGaps" => $data["learningGaps"],
         "activities" => $data["activities"]
     ];

@@ -64,6 +64,7 @@ $summaryCards = $analysis["summaryCards"] ?? [];
 $skills = $analysis["skills"] ?? [];
 $dimensions = $analysis["dimensions"] ?? [];
 $learningGaps = $analysis["learningGaps"] ?? [];
+$careerFit = $analysis["careerFit"] ?? [];
 $activities = $analysis["activities"] ?? [];
 
 $total_repositories = $repoStats["total"] ?? 0;
@@ -134,6 +135,17 @@ $masked_session_id = session_id() !== ""
                 $gap["priority"] ?? "Low Priority",
             ]);
         }
+
+        $insertCareerFit = $pdo->prepare(
+            "INSERT INTO career_fit_scores (analysis_id, role_name, match_score) VALUES (?, ?, ?)"
+        );
+        foreach ($careerFit as $fit) {
+            $insertCareerFit->execute([
+                $newAnalysisId,
+                $fit["role"] ?? "",
+                $fit["match"] ?? 0,
+            ]);
+        }
     }
 
     $analysisHistory = [];
@@ -174,6 +186,7 @@ $masked_session_id = session_id() !== ""
             <a href="#github" class="block px-4 py-3 rounded-lg hover:bg-slate-800">GitHub Connection</a>
             <a href="#skills" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Skill Verification</a>
             <a href="#dimensions" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Score Dimensions</a>
+            <a href="#career-fit" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Career Fit</a>
             <a href="#gaps" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Learning Gap</a>
             <a href="#history" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Analysis History</a>
             <a href="#security" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Account Security</a>
@@ -403,6 +416,40 @@ $masked_session_id = session_id() !== ""
                         </div>
                     <?php endforeach; ?>
                 </div>
+            </div>
+
+            <div id="career-fit" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <p class="text-xs uppercase tracking-widest text-blue-700 font-extrabold">Career Fit Analysis</p>
+                <h3 class="text-xl font-extrabold mt-1">Suitability For Predefined Career Roles</h3>
+                <p class="text-sm text-slate-500 mt-1">
+                    Match percentage is calculated from your verified skills and score dimensions - not self-declared.
+                </p>
+
+                <?php if (empty($careerFit)): ?>
+                    <p class="text-sm text-slate-400 mt-5">Connect your GitHub account to see career fit results.</p>
+                <?php else: ?>
+                    <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <?php foreach ($careerFit as $index => $fit):
+                            $match = (int) ($fit["match"] ?? 0);
+                            $barColor = $match >= 70 ? "bg-green-500" : ($match >= 40 ? "bg-amber-500" : "bg-slate-300");
+                        ?>
+                            <div class="border border-slate-200 rounded-xl p-4 <?php echo $index === 0 && $match > 0 ? "ring-2 ring-blue-500" : ""; ?>">
+                                <div class="flex items-center justify-between gap-3">
+                                    <h4 class="font-extrabold">
+                                        <?php echo safe_output($fit["role"] ?? ""); ?>
+                                        <?php if ($index === 0 && $match > 0): ?>
+                                            <span class="ml-2 text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full align-middle font-bold">Best Fit</span>
+                                        <?php endif; ?>
+                                    </h4>
+                                    <span class="font-extrabold text-blue-900"><?php echo $match; ?>%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2 mt-3">
+                                    <div class="<?php echo $barColor; ?> h-2 rounded-full" style="width: <?php echo $match; ?>%;"></div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div id="gaps" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">

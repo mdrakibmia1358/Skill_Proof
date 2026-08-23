@@ -50,6 +50,7 @@ $analysis = $analysisStmt->fetch();
 $skills = [];
 $dimensions = [];
 $gaps = [];
+$careerFit = [];
 
 if ($analysis) {
     $skillStmt = $pdo->prepare(
@@ -72,6 +73,13 @@ if ($analysis) {
     );
     $gapStmt->execute([$analysis["analysis_id"]]);
     $gaps = $gapStmt->fetchAll();
+
+    $fitStmt = $pdo->prepare(
+        "SELECT role_name, match_score
+         FROM career_fit_scores WHERE analysis_id = ? ORDER BY match_score DESC"
+    );
+    $fitStmt->execute([$analysis["analysis_id"]]);
+    $careerFit = $fitStmt->fetchAll();
 }
 
 // 4. Log the report generation event.
@@ -154,19 +162,7 @@ $pdf->Cell(0, 10, pdf_txt($developer["full_name"]), 0, 1, "L");
 $pdf->SetFont("Helvetica", "", 11);
 $pdf->SetTextColor(80, 80, 80);
 $pdf->Cell(0, 7, pdf_txt("Email: " . $developer["email"]), 0, 1, "L");
-$analyzedGithub = $analysis["github_username"] ?? null;
-$registeredGithub = $developer["github_username"] ?? null;
-
-if ($analyzedGithub) {
-    $pdf->Cell(0, 7, pdf_txt("GitHub (analyzed): " . $analyzedGithub), 0, 1, "L");
-    if ($registeredGithub && $registeredGithub !== $analyzedGithub) {
-        $pdf->SetTextColor(180, 100, 0);
-        $pdf->Cell(0, 6, pdf_txt("Note: registered account is \"" . $registeredGithub . "\" - scores reflect a different GitHub account."), 0, 1, "L");
-        $pdf->SetTextColor(80, 80, 80);
-    }
-} else {
-    $pdf->Cell(0, 7, pdf_txt("GitHub: " . ($registeredGithub ?: "Not connected")), 0, 1, "L");
-}
+$pdf->Cell(0, 7, pdf_txt("GitHub: " . ($developer["github_username"] ?: "Not connected")), 0, 1, "L");
 if (!empty($developer["bio"])) {
     $pdf->MultiCell(0, 6, pdf_txt("Bio: " . $developer["bio"]));
 }
@@ -222,6 +218,16 @@ if (!$analysis) {
         $pdf->ScoreBar($dimension["dimension_name"], $dimension["score"]);
     }
     $pdf->Ln(4);
+
+    // --- Career fit analysis (FR-6) ---
+    if (!empty($careerFit)) {
+        $pdf->SectionTitle("Career Fit Analysis");
+        foreach ($careerFit as $index => $fit) {
+            $label = $fit["role_name"] . ($index === 0 && ($fit["match_score"] ?? 0) > 0 ? " (Best Fit)" : "");
+            $pdf->ScoreBar($label, $fit["match_score"]);
+        }
+        $pdf->Ln(4);
+    }
 
     // --- Learning gaps ---
     if (!empty($gaps)) {

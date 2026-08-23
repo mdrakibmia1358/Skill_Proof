@@ -70,6 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
                         $skills = $signupAnalysis["skills"] ?? [];
                         $dimensions = $signupAnalysis["dimensions"] ?? [];
                         $learningGaps = $signupAnalysis["learningGaps"] ?? [];
+                        $careerFit = $signupAnalysis["careerFit"] ?? [];
                         $trust_score = $signupAnalysis["scores"]["trust"] ?? 0;
                         $career_score = $signupAnalysis["scores"]["career"] ?? 0;
 
@@ -114,6 +115,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
                         foreach ($learningGaps as $gap) {
                             $insertGap->execute([
                                 $newAnalysisId, $gap["title"] ?? "", $gap["text"] ?? ($gap["description"] ?? ""), $gap["priority"] ?? "Low Priority",
+                            ]);
+                        }
+
+                        $insertCareerFit = $pdo->prepare(
+                            "INSERT INTO career_fit_scores (analysis_id, role_name, match_score) VALUES (?, ?, ?)"
+                        );
+                        foreach ($careerFit as $fit) {
+                            $insertCareerFit->execute([
+                                $newAnalysisId, $fit["role"] ?? "", $fit["match"] ?? 0,
                             ]);
                         }
                     }

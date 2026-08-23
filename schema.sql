@@ -12,13 +12,13 @@ USE skillproof_db;
 -- Drop tables first (child -> parent order) so this script can be
 -- safely re-run any number of times during development/demo.
 DROP TABLE IF EXISTS learning_gaps;
+DROP TABLE IF EXISTS recruiter_reports;
+DROP TABLE IF EXISTS career_fit_scores;
 DROP TABLE IF EXISTS dimension_scores;
 DROP TABLE IF EXISTS skill_scores;
 DROP TABLE IF EXISTS skill_analyses;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS learning_gaps;
-DROP TABLE IF EXISTS recruiter_reports;
-DROP TABLE IF EXISTS dimension_scores;
+
 CREATE TABLE users (
     user_id         INT AUTO_INCREMENT PRIMARY KEY,
     full_name       VARCHAR(100)  NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE skill_analyses (
     languages_detected     INT DEFAULT 0,
     readme_count           INT DEFAULT 0,
     trust_score            TINYINT UNSIGNED DEFAULT 0,
-    career_score            TINYINT UNSIGNED DEFAULT 0,
+    career_score           TINYINT UNSIGNED DEFAULT 0,
     analyzed_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB;
@@ -64,6 +64,14 @@ CREATE TABLE dimension_scores (
     dimension_name VARCHAR(80)  NOT NULL,
     score          TINYINT UNSIGNED NOT NULL,
     evidence       VARCHAR(255) NOT NULL,
+    FOREIGN KEY (analysis_id) REFERENCES skill_analyses(analysis_id) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE career_fit_scores (
+    fit_id       INT AUTO_INCREMENT PRIMARY KEY,
+    analysis_id  INT NOT NULL,
+    role_name    VARCHAR(80) NOT NULL,
+    match_score  TINYINT UNSIGNED NOT NULL,
     FOREIGN KEY (analysis_id) REFERENCES skill_analyses(analysis_id) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
@@ -97,9 +105,9 @@ INSERT INTO users (user_id, full_name, email, password_hash, role, github_userna
 (2, 'Nondini Ghosh',   'nondini@university.edu', '$2y$10$0MWeaGLlEaSD0uYMUC0UduQiXUEv3BePZwKKfA.JHgcvTfMKl0KAq', 'Developer', NULL);
 
 INSERT INTO skill_analyses
-    (analysis_id, user_id, github_username, total_repositories, original_repositories, forked_repositories, total_stars, total_forks, languages_detected, readme_count)
+    (analysis_id, user_id, github_username, total_repositories, original_repositories, forked_repositories, total_stars, total_forks, languages_detected, readme_count, trust_score, career_score)
 VALUES
-    (1, 1, 'torvalds', 8, 6, 2, 3200, 1400, 4, 5);
+    (1, 1, 'torvalds', 8, 6, 2, 3200, 1400, 4, 5, 72, 68);
 
 INSERT INTO skill_scores (analysis_id, skill_name, score, level, evidence, status) VALUES
 (1, 'JavaScript', 72, 'Intermediate', 'Detected in 4 repositories', 'Verified'),

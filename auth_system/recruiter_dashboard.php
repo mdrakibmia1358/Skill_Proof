@@ -43,6 +43,7 @@ $pdo = skillproof_db();
 
 // 2. Read filters from the query string (GET so results are shareable/bookmarkable).
 $skillFilter = trim($_GET["skill"] ?? "");
+$roleFilter  = trim($_GET["role"] ?? "");
 $minTrust    = isset($_GET["min_trust"]) && $_GET["min_trust"] !== "" ? max(0, min(100, (int) $_GET["min_trust"])) : 0;
 $maxTrust    = isset($_GET["max_trust"]) && $_GET["max_trust"] !== "" ? max(0, min(100, (int) $_GET["max_trust"])) : 100;
 
@@ -50,12 +51,15 @@ if ($minTrust > $maxTrust) {
     [$minTrust, $maxTrust] = [$maxTrust, $minTrust];
 }
 
+$careerRoles = ["Backend Developer", "Full Stack Developer", "Database Developer", "Software Engineer"];
+
 // 3. Build the developer search query.
 //    - Only the LATEST analysis per developer is considered (subquery picks MAX(analysis_id) per user).
 //    - Skill filter matches against skill_scores for that latest analysis (score >= 50 = meaningful evidence).
+//    - Career role filter matches against career_fit_scores (match_score >= 50 = meaningful fit).
 $sql = "
-    SELECT u.user_id, u.full_name, u.email, u.github_username AS registered_github, u.bio,
-           sa.analysis_id, sa.github_username AS analyzed_github, sa.total_repositories, sa.total_stars, sa.languages_detected,
+    SELECT u.user_id, u.full_name, u.email, u.github_username, u.bio,
+           sa.analysis_id, sa.total_repositories, sa.total_stars, sa.languages_detected,
            sa.trust_score, sa.career_score, sa.analyzed_at
     FROM users u
     INNER JOIN (
@@ -80,11 +84,20 @@ if ($skillFilter !== "") {
     $sql .= " AND EXISTS (
         SELECT 1 FROM skill_scores ss
         WHERE ss.analysis_id = sa.analysis_id
-          AND (ss.skill_name = :skill_exact OR ss.skill_name LIKE :skill_filter)
+          AND ss.skill_name LIKE :skill_filter
           AND ss.score >= 50
     )";
-    $params["skill_exact"]  = $skillFilter;
-    $params["skill_filter"] = $skillFilter . "%";
+    $params["skill_filter"] = "%" . $skillFilter . "%";
+}
+
+if ($roleFilter !== "" && in_array($roleFilter, $careerRoles, true)) {
+    $sql .= " AND EXISTS (
+        SELECT 1 FROM career_fit_scores cf
+        WHERE cf.analysis_id = sa.analysis_id
+          AND cf.role_name = :role_filter
+          AND cf.match_score >= 50
+    )";
+    $params["role_filter"] = $roleFilter;
 }
 
 $sql .= " ORDER BY sa.trust_score DESC, u.full_name ASC LIMIT 50";
@@ -93,16 +106,25 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $developers = $stmt->fetchAll();
 
-// 4. For each result, pull its top 3 verified skills (small per-row query, result set is capped at 50).
+// 4. For each result, pull its top 3 verified skills and best-fit career role
+//    (small per-row query, result set is capped at 50).
 $topSkillsStmt = $pdo->prepare(
     "SELECT skill_name, score FROM skill_scores
      WHERE analysis_id = ? AND score > 0
      ORDER BY score DESC LIMIT 3"
 );
 
+$bestFitStmt = $pdo->prepare(
+    "SELECT role_name, match_score FROM career_fit_scores
+     WHERE analysis_id = ? ORDER BY match_score DESC LIMIT 1"
+);
+
 foreach ($developers as &$dev) {
     $topSkillsStmt->execute([$dev["analysis_id"]]);
     $dev["top_skills"] = $topSkillsStmt->fetchAll();
+
+    $bestFitStmt->execute([$dev["analysis_id"]]);
+    $dev["best_fit"] = $bestFitStmt->fetch();
 }
 unset($dev);
 
@@ -139,6 +161,7 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
                 &larr; Back to Home
             </a>
             <a href="recruiter_dashboard.php" class="block px-4 py-3 rounded-lg bg-blue-600 font-bold">Search Developers</a>
+            <a href="profile.php" class="block px-4 py-3 rounded-lg hover:bg-slate-800 border-t border-slate-800 mt-2 pt-4">My Profile</a>
         </nav>
 
         <div class="mt-auto p-4">
@@ -180,7 +203,7 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
             <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 <h3 class="text-xl font-extrabold mb-4">Search Verified Developer Profiles</h3>
 
-                <form method="GET" action="recruiter_dashboard.php" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <form method="GET" action="recruiter_dashboard.php" class="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div class="md:col-span-2">
                         <label class="block text-sm font-bold text-slate-700 mb-2">Skill</label>
                         <input
@@ -190,6 +213,17 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
                             placeholder="e.g. JavaScript, SQL, Documentation"
                             class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Career Role</label>
+                        <select name="role" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="">Any role</option>
+                            <?php foreach ($careerRoles as $roleOption): ?>
+                                <option value="<?php echo safe_output($roleOption); ?>" <?php echo $roleFilter === $roleOption ? "selected" : ""; ?>>
+                                    <?php echo safe_output($roleOption); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Min Trust Score</label>
@@ -207,7 +241,7 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
                             class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
                     </div>
-                    <div class="md:col-span-4 flex gap-3">
+                    <div class="md:col-span-5 flex gap-3">
                         <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold">
                             Search
                         </button>
@@ -236,7 +270,7 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
                                     <th class="text-left px-5 py-3">Developer</th>
                                     <th class="text-left px-5 py-3">GitHub</th>
                                     <th class="text-left px-5 py-3">Trust Score</th>
-                                    <th class="text-left px-5 py-3">Career Readiness</th>
+                                    <th class="text-left px-5 py-3">Best Fit Role</th>
                                     <th class="text-left px-5 py-3">Top Skills</th>
                                     <th class="text-left px-5 py-3">Report</th>
                                 </tr>
@@ -249,18 +283,18 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
                                             <div class="text-slate-400 text-xs"><?php echo safe_output($dev["email"]); ?></div>
                                         </td>
                                         <td class="px-5 py-4 text-slate-600">
-                                            <div class="font-bold text-slate-800"><?php echo safe_output($dev["analyzed_github"]); ?></div>
-                                            <?php if (!empty($dev["registered_github"]) && $dev["registered_github"] !== $dev["analyzed_github"]): ?>
-                                                <div class="text-xs text-amber-600 mt-1">
-                                                    Registered as "<?php echo safe_output($dev["registered_github"]); ?>"
-                                                </div>
-                                            <?php endif; ?>
+                                            <?php echo $dev["github_username"] ? safe_output($dev["github_username"]) : "—"; ?>
                                         </td>
                                         <td class="px-5 py-4">
                                             <span class="font-extrabold text-blue-900"><?php echo safe_output($dev["trust_score"]); ?>%</span>
                                         </td>
                                         <td class="px-5 py-4">
-                                            <span class="font-extrabold text-slate-700"><?php echo safe_output($dev["career_score"]); ?>%</span>
+                                            <?php if (empty($dev["best_fit"]) || ($dev["best_fit"]["match_score"] ?? 0) <= 0): ?>
+                                                <span class="text-slate-400 text-xs">Not enough evidence</span>
+                                            <?php else: ?>
+                                                <div class="font-semibold text-slate-800"><?php echo safe_output($dev["best_fit"]["role_name"]); ?></div>
+                                                <div class="text-xs text-slate-500"><?php echo safe_output($dev["best_fit"]["match_score"]); ?>% match</div>
+                                            <?php endif; ?>
                                         </td>
                                         <td class="px-5 py-4">
                                             <?php if (empty($dev["top_skills"])): ?>
@@ -276,7 +310,12 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
                                             <?php endif; ?>
                                         </td>
                                         <td class="px-5 py-4">
-                                            <a href="report.php?user_id=<?php echo (int) $dev["user_id"]; ?>" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold">Download PDF</a>
+                                            <a
+                                                href="report.php?user_id=<?php echo (int) $dev["user_id"]; ?>"
+                                                class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold"
+                                            >
+                                                Download PDF
+                                            </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
