@@ -25,8 +25,10 @@ CREATE TABLE users (
     email           VARCHAR(150)  NOT NULL UNIQUE,
     password_hash   VARCHAR(255)  NOT NULL,
     role            ENUM('Developer', 'Recruiter', 'Admin') NOT NULL DEFAULT 'Developer',
+    status          ENUM('Active', 'Blocked') NOT NULL DEFAULT 'Active',
     github_username VARCHAR(100)  NULL,
     bio             TEXT          NULL,
+    public_slug     VARCHAR(64)   NULL UNIQUE,
     created_at      TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
 ) ENGINE = InnoDB;
 

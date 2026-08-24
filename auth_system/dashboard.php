@@ -15,6 +15,11 @@ if (($_SESSION["user_role"] ?? "") === "Recruiter") {
     exit();
 }
 
+if (($_SESSION["user_role"] ?? "") === "Admin") {
+    header("Location: admin_dashboard.php");
+    exit();
+}
+
 $timeout_duration = 300;
 
 if (
@@ -31,6 +36,7 @@ $_SESSION["last_activity"] = time();
 
 require_once __DIR__ . "/engine/skillproof_engine.php";
 require_once __DIR__ . "/csrf.php";
+require_once __DIR__ . "/public_slug.php";
 
 function safe_output($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8");
@@ -48,11 +54,15 @@ $login_time = $_SESSION["login_time"] ?? time();
 // GitHub identity is locked to the account provided at registration.
 // A developer can re-sync (re-analyze) their own account, but cannot
 // point their profile at someone else's GitHub username.
-$userLookup = $pdo->prepare("SELECT user_id, github_username FROM users WHERE email = ? LIMIT 1");
+$userLookup = $pdo->prepare("SELECT user_id, github_username, public_slug FROM users WHERE email = ? LIMIT 1");
 $userLookup->execute([$user_email]);
 $userRow = $userLookup->fetch();
 $current_user_id = $userRow ? (int) $userRow["user_id"] : null;
 $github_username = $userRow["github_username"] ?? "";
+
+// FR-9: Ensure this developer has a public profile slug (generates one
+// lazily for accounts created before this feature existed).
+$public_slug = $current_user_id ? sp_ensure_public_slug($pdo, $current_user_id, $userRow["public_slug"] ?? null) : null;
 
 $analysis = skillproof_analyze_github_user($github_username);
 
@@ -191,6 +201,15 @@ $masked_session_id = session_id() !== ""
             <a href="#history" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Analysis History</a>
             <a href="#security" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Account Security</a>
             <a href="profile.php" class="block px-4 py-3 rounded-lg hover:bg-slate-800 border-t border-slate-800 mt-2 pt-4">My Profile</a>
+            <?php if (!empty($public_slug)): ?>
+                <a
+                    href="../public_profile.php?slug=<?php echo urlencode($public_slug); ?>"
+                    target="_blank" rel="noopener"
+                    class="block px-4 py-3 rounded-lg hover:bg-slate-800 text-blue-300"
+                >
+                    View Public Profile &rarr;
+                </a>
+            <?php endif; ?>
         </nav>
 
         <div class="mt-auto p-4">

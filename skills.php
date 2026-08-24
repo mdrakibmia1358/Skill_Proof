@@ -1,7 +1,8 @@
 <?php
 session_start();
 $is_logged_in = isset($_SESSION["user_email"]);
-$dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_system/recruiter_dashboard.php" : "auth_system/dashboard.php";
+$dashboard_link = (($_SESSION["user_role"] ?? "") === "Admin") ? "auth_system/admin_dashboard.php"
+    : (($_SESSION["user_role"] ?? "") === "Recruiter" ? "auth_system/recruiter_dashboard.php" : "auth_system/dashboard.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -292,7 +293,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 </div>
 
                 <a
-                    href="<?php echo $is_logged_in ? 'auth_system/dashboard.php' : 'http://localhost/auth_system/register.php'; ?>"
+                    href="<?php echo $is_logged_in ? $dashboard_link : 'http://localhost/auth_system/register.php'; ?>"
                     class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-bold text-sm"
                 >
                     Submit Evidence

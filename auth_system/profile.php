@@ -3,6 +3,7 @@
 
 session_start();
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/public_slug.php';
 
 // 1. Correct relative path to db_connect.php inside auth_system
 require_once 'db_connect.php';
@@ -30,7 +31,7 @@ if (function_exists('skillproof_db')) {
 
 // 4. Fetch Current User Data via Prepared Statement
 try {
-    $stmt = $pdo->prepare("SELECT user_id, full_name, email, bio, github_username, role FROM users WHERE email = ? LIMIT 1");
+    $stmt = $pdo->prepare("SELECT user_id, full_name, email, bio, github_username, role, public_slug FROM users WHERE email = ? LIMIT 1");
     $stmt->execute([$user_email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -40,6 +41,12 @@ try {
     }
 
     $user_id = (int) $user['user_id'];
+
+    // FR-9: Every Developer gets a unique public profile URL. Generate
+    // one lazily for accounts created before this feature existed.
+    if (($user['role'] ?? '') === 'Developer') {
+        $user['public_slug'] = sp_ensure_public_slug($pdo, $user_id, $user['public_slug'] ?? null);
+    }
 } catch (PDOException $e) {
     // Log the real error for developers; never expose raw exception
     // details to the end user (prevents information disclosure).
@@ -80,9 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
     $error = "Your session expired. Please try saving again.";
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bio = trim($_POST['bio'] ?? '');
-    $github_username = trim($_POST['github_username'] ?? $user['github_username']);
+    $is_admin = ($user['role'] ?? '') === 'Admin';
+    $github_username = $is_admin ? ($user['github_username'] ?? '') : trim($_POST['github_username'] ?? $user['github_username']);
 
-    if (strlen($github_username) < 3) {
+    if (!$is_admin && strlen($github_username) < 3) {
         $error = "GitHub username should contain at least 3 characters.";
     } else {
         try {
@@ -137,7 +145,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
         <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
             <a href="../home.php" class="hover:text-white transition">Home</a>
             <a href="../skills.php" class="hover:text-white transition">Skills</a>
-            <a href="<?php echo ($user['role'] ?? '') === 'Recruiter' ? 'recruiter_dashboard.php' : 'dashboard.php'; ?>" class="hover:text-white transition">Dashboard</a>
+            <a href="<?php
+                $r = $user['role'] ?? '';
+                echo $r === 'Admin' ? 'admin_dashboard.php' : ($r === 'Recruiter' ? 'recruiter_dashboard.php' : 'dashboard.php');
+            ?>" class="hover:text-white transition">Dashboard</a>
             <a href="profile.php" class="text-white font-semibold border-b-2 border-blue-500 pb-1">Profile</a>
         </div>
 
@@ -155,10 +166,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
             <!-- Left Column: Profile Form -->
             <div class="lg:col-span-7 space-y-6">
                 <div class="inline-flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 rounded-full px-4 py-1.5 text-xs text-slate-300 font-medium">
-                    <span class="w-2 h-2 rounded-full <?php echo (($user['role'] ?? '') === 'Recruiter' || ($latestAnalysis && ($latestAnalysis['trust_score'] ?? 0) > 0)) ? 'bg-blue-400 animate-pulse' : 'bg-slate-500'; ?>"></span>
+                    <span class="w-2 h-2 rounded-full <?php echo (in_array($user['role'] ?? '', ['Recruiter', 'Admin'], true) || ($latestAnalysis && ($latestAnalysis['trust_score'] ?? 0) > 0)) ? 'bg-blue-400 animate-pulse' : 'bg-slate-500'; ?>"></span>
                     <span>
                         <?php
-                        if (($user['role'] ?? '') === 'Recruiter') {
+                        if (($user['role'] ?? '') === 'Admin') {
+                            echo 'Administrator Account';
+                        } elseif (($user['role'] ?? '') === 'Recruiter') {
                             echo 'Recruiter Account';
                         } elseif ($latestAnalysis && ($latestAnalysis['trust_score'] ?? 0) > 0) {
                             echo 'Verified Developer Account';
@@ -209,6 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                                 class="w-full bg-slate-800/50 border border-slate-700/60 text-slate-300 px-4 py-3 rounded-xl text-sm focus:outline-none cursor-not-allowed">
                         </div>
 
+                        <?php if (($user['role'] ?? '') !== 'Admin'): ?>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">GitHub Username</label>
                             <input type="text" name="github_username" required minlength="3"
@@ -221,6 +235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                                 </p>
                             <?php endif; ?>
                         </div>
+                        <?php endif; ?>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Developer Bio & Summary</label>
@@ -241,7 +256,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
 
             <!-- Right Column: Real profile summary (role-aware) -->
             <div class="lg:col-span-5">
-                <?php if (($user['role'] ?? '') === 'Recruiter'): ?>
+                <?php if (($user['role'] ?? '') === 'Admin'): ?>
+
+                    <div class="bg-white text-slate-900 rounded-3xl p-8 shadow-2xl space-y-6">
+                        <div>
+                            <h3 class="font-extrabold text-xl text-slate-900 tracking-tight">Administrator</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Manage users and monitor platform health</p>
+                        </div>
+                        <a href="admin_dashboard.php" class="block text-center bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-3 rounded-xl text-sm transition">
+                            Go to Admin Dashboard
+                        </a>
+                    </div>
+
+                <?php elseif (($user['role'] ?? '') === 'Recruiter'): ?>
 
                     <div class="bg-white text-slate-900 rounded-3xl p-8 shadow-2xl space-y-6">
                         <div>
@@ -328,8 +355,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                 <?php endif; ?>
             </div>
 
+            <?php if (($user['role'] ?? '') === 'Developer' && !empty($user['public_slug'])):
+                $publicUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://')
+                    . $_SERVER['HTTP_HOST'] . '/public_profile.php?slug=' . urlencode($user['public_slug']);
+            ?>
+                <div class="lg:col-span-12 bg-white border border-slate-800/10 rounded-3xl p-6 shadow-2xl">
+                    <h3 class="font-extrabold text-lg text-slate-900">Your Public Profile Link</h3>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Share this link with recruiters. It shows your verified skills, career fit, and activity charts -
+                        no login required to view it.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                        <input
+                            id="publicProfileUrl" type="text" readonly
+                            value="<?php echo htmlspecialchars($publicUrl, ENT_QUOTES, 'UTF-8'); ?>"
+                            class="flex-1 px-4 py-3 border border-slate-200 bg-slate-50 text-slate-600 rounded-xl text-sm focus:outline-none"
+                        >
+                        <button
+                            type="button" onclick="sp_copyPublicUrl()"
+                            class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm whitespace-nowrap"
+                        >
+                            Copy Link
+                        </button>
+                        <a
+                            href="<?php echo htmlspecialchars($publicUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener"
+                            class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm text-center whitespace-nowrap"
+                        >
+                            Preview
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+
         </div>
     </main>
+
+    <script>
+        function sp_copyPublicUrl() {
+            const input = document.getElementById("publicProfileUrl");
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value).catch(() => document.execCommand("copy"));
+        }
+    </script>
 
 </body>
 </html>

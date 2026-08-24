@@ -21,8 +21,8 @@ if (!isset($_SESSION["user_email"])) {
 }
 
 if (($_SESSION["user_role"] ?? "") !== "Recruiter") {
-    // Developers who somehow land here are sent back to their own dashboard.
-    header("Location: dashboard.php");
+    // Developers/Admins who somehow land here are sent to their own dashboard.
+    header("Location: " . (($_SESSION["user_role"] ?? "") === "Admin" ? "admin_dashboard.php" : "dashboard.php"));
     exit();
 }
 
@@ -58,7 +58,7 @@ $careerRoles = ["Backend Developer", "Full Stack Developer", "Database Developer
 //    - Skill filter matches against skill_scores for that latest analysis (score >= 50 = meaningful evidence).
 //    - Career role filter matches against career_fit_scores (match_score >= 50 = meaningful fit).
 $sql = "
-    SELECT u.user_id, u.full_name, u.email, u.github_username, u.bio,
+    SELECT u.user_id, u.full_name, u.email, u.github_username, u.bio, u.public_slug,
            sa.analysis_id, sa.total_repositories, sa.total_stars, sa.languages_detected,
            sa.trust_score, sa.career_score, sa.analyzed_at
     FROM users u
@@ -310,12 +310,23 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
                                             <?php endif; ?>
                                         </td>
                                         <td class="px-5 py-4">
-                                            <a
-                                                href="report.php?user_id=<?php echo (int) $dev["user_id"]; ?>"
-                                                class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold"
-                                            >
-                                                Download PDF
-                                            </a>
+                                            <div class="flex gap-2">
+                                                <a
+                                                    href="report.php?user_id=<?php echo (int) $dev["user_id"]; ?>"
+                                                    class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold"
+                                                >
+                                                    Download PDF
+                                                </a>
+                                                <?php if (!empty($dev["public_slug"])): ?>
+                                                    <a
+                                                        href="../public_profile.php?slug=<?php echo urlencode($dev["public_slug"]); ?>"
+                                                        target="_blank" rel="noopener"
+                                                        class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold"
+                                                    >
+                                                        Public Profile
+                                                    </a>
+                                                <?php endif; ?>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

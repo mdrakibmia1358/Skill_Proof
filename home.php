@@ -1,7 +1,8 @@
 <?php
 session_start();
 $is_logged_in = isset($_SESSION["user_email"]);
-$dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_system/recruiter_dashboard.php" : "auth_system/dashboard.php";
+$dashboard_link = (($_SESSION["user_role"] ?? "") === "Admin") ? "auth_system/admin_dashboard.php"
+    : (($_SESSION["user_role"] ?? "") === "Recruiter" ? "auth_system/recruiter_dashboard.php" : "auth_system/dashboard.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">

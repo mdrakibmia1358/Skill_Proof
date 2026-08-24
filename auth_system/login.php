@@ -12,7 +12,8 @@ function safe_output($value) {
 }
 
 if (isset($_SESSION["user_email"])) {
-    header("Location: " . (($_SESSION["user_role"] ?? "") === "Recruiter" ? "recruiter_dashboard.php" : "dashboard.php"));
+    $role = $_SESSION["user_role"] ?? "";
+    header("Location: " . ($role === "Admin" ? "admin_dashboard.php" : ($role === "Recruiter" ? "recruiter_dashboard.php" : "dashboard.php")));
     exit();
 }
 
@@ -33,19 +34,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         require_once __DIR__ . "/db_connect.php";
         $pdo = skillproof_db();
 
-        $stmt = $pdo->prepare("SELECT user_id, full_name, email, password_hash, role FROM users WHERE email = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT user_id, full_name, email, password_hash, role, status FROM users WHERE email = ? LIMIT 1");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user["password_hash"])) {
+            if (($user["status"] ?? "Active") === "Blocked") {
+                $error_message = "Your account has been blocked. Please contact an administrator.";
+            } else {
             session_regenerate_id(true);
             $_SESSION["user_email"]    = $user["email"];
             $_SESSION["user_role"]     = $user["role"];
             $_SESSION["login_time"]    = time();
             $_SESSION["last_activity"] = time();
 
-            header("Location: " . ($user["role"] === "Recruiter" ? "recruiter_dashboard.php" : "dashboard.php"));
+            header("Location: " . ($user["role"] === "Admin" ? "admin_dashboard.php" : ($user["role"] === "Recruiter" ? "recruiter_dashboard.php" : "dashboard.php")));
             exit();
+            }
         } else {
             $error_message = "Invalid credential combination. Please try again.";
 
