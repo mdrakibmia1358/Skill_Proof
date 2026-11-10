@@ -3,7 +3,8 @@ session_start();
 require_once __DIR__ . "/csrf.php";
 
 $error_message = "";
-$success_message = $_GET["msg"] ?? "";
+$success_message = is_string($_SESSION["login_flash"] ?? null) ? $_SESSION["login_flash"] : "";
+unset($_SESSION["login_flash"]);
 $email = "";
 $csrf_token = sp_csrf_token();
 
@@ -71,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
             <!-- Logo -->
-            <a href="http://localhost/home.php" class="flex items-center gap-3">
+            <a href="/home.php" class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
                     <span class="text-white font-extrabold text-lg">SP</span>
                 </div>
@@ -88,9 +89,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center gap-8 text-sm">
-                <a href="http://localhost/home.php" class="text-slate-300 hover:text-white">Home</a>
-                <a href="http://localhost/skills.php" class="text-slate-300 hover:text-white">Skills</a>
-                <a href="http://localhost/recruiter.php" class="text-slate-300 hover:text-white">Recruiters</a>
+                <a href="/home.php" class="text-slate-300 hover:text-white">Home</a>
+                <a href="/skills.php" class="text-slate-300 hover:text-white">Skills</a>
+                <a href="/recruiter.php" class="text-slate-300 hover:text-white">Recruiters</a>
                 <a href="register.php" class="text-slate-300 hover:text-white">Sign Up</a>
                 <a href="login.php" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition">
                     Login
@@ -105,9 +106,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 px-6 pb-4 space-y-2 text-sm">
-            <a href="http://localhost/home.php" class="block py-2 text-slate-300">Home</a>
-            <a href="http://localhost/skills.php" class="block py-2 text-slate-300">Skills</a>
-            <a href="http://localhost/recruiter.php" class="block py-2 text-slate-300">Recruiters</a>
+            <a href="/home.php" class="block py-2 text-slate-300">Home</a>
+            <a href="/skills.php" class="block py-2 text-slate-300">Skills</a>
+            <a href="/recruiter.php" class="block py-2 text-slate-300">Recruiters</a>
             <a href="register.php" class="block py-2 text-slate-300">Sign Up</a>
             <a href="login.php" class="block py-2 text-blue-300 font-bold">Login</a>
         </div>

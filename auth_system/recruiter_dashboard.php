@@ -33,7 +33,10 @@ if (
 ) {
     session_unset();
     session_destroy();
-    header("Location: login.php?msg=Session timed out due to inactivity");
+    session_id("");
+    session_start();
+    $_SESSION["login_flash"] = "Session timed out due to inactivity";
+    header("Location: login.php");
     exit();
 }
 $_SESSION["last_activity"] = time();

@@ -1,0 +1,4 @@
+# Keep database credentials inaccessible to browser requests.
+<FilesMatch "^db_config\.(local|example)\.php$">
+    Require all denied
+</FilesMatch>

@@ -45,9 +45,9 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                         Logout
                     </a>
                 <?php else: ?>
-                    <a href="http://localhost/auth_system/register.php" class="text-slate-300 hover:text-white">Sign Up</a>
+                    <a href="/auth_system/register.php" class="text-slate-300 hover:text-white">Sign Up</a>
                     <a
-                        href="http://localhost/auth_system/login.php"
+                        href="/auth_system/login.php"
                         class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition"
                     >
                         Login
@@ -71,8 +71,8 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 <a href="auth_system/profile.php" class="block py-2 text-slate-300">Profile</a>
                 <a href="auth_system/logout.php" class="block py-2 text-red-300 font-bold">Logout</a>
             <?php else: ?>
-                <a href="http://localhost/auth_system/register.php" class="block py-2 text-slate-300">Sign Up</a>
-                <a href="http://localhost/auth_system/login.php" class="block py-2 text-blue-300 font-bold">Login</a>
+                <a href="/auth_system/register.php" class="block py-2 text-slate-300">Sign Up</a>
+                <a href="/auth_system/login.php" class="block py-2 text-blue-300 font-bold">Login</a>
             <?php endif; ?>
         </div>
     </header>
@@ -97,7 +97,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
 
                 <div class="mt-8 flex flex-wrap gap-4">
                     <a
-                        href="<?php echo $is_logged_in ? 'auth_system/dashboard.php' : 'http://localhost/auth_system/register.php'; ?>"
+                        href="<?php echo $is_logged_in ? 'auth_system/dashboard.php' : '/auth_system/register.php'; ?>"
                         class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
                     >
                         Join as Recruiter
@@ -235,7 +235,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 </div>
 
                 <a
-                    href="<?php echo $is_logged_in ? 'auth_system/dashboard.php' : 'http://localhost/auth_system/register.php'; ?>"
+                    href="<?php echo $is_logged_in ? 'auth_system/dashboard.php' : '/auth_system/register.php'; ?>"
                     class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-bold text-sm"
                 >
                     Request Access
@@ -312,14 +312,14 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                     </a>
                 <?php else: ?>
                     <a
-                        href="http://localhost/auth_system/register.php"
+                        href="/auth_system/register.php"
                         class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
                     >
                         Join as Recruiter
                     </a>
 
                     <a
-                        href="http://localhost/auth_system/login.php"
+                        href="/auth_system/login.php"
                         class="bg-white text-slate-950 px-7 py-3 rounded-xl font-bold hover:bg-slate-100 transition"
                     >
                         Login
@@ -341,8 +341,8 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 <?php if ($is_logged_in): ?>
                     <a href="<?php echo $dashboard_link; ?>" class="hover:text-white">Dashboard</a>
                 <?php else: ?>
-                    <a href="http://localhost/auth_system/register.php" class="hover:text-white">Sign Up</a>
-                    <a href="http://localhost/auth_system/login.php" class="hover:text-white">Login</a>
+                    <a href="/auth_system/register.php" class="hover:text-white">Sign Up</a>
+                    <a href="/auth_system/login.php" class="hover:text-white">Login</a>
                 <?php endif; ?>
             </div>
         </div>

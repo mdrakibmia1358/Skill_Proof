@@ -1,0 +1,5 @@
+Options -Indexes
+# Block direct downloads of development/database files if accidentally uploaded.
+<FilesMatch "\.(sql|md|sh|log)$">
+    Require all denied
+</FilesMatch>

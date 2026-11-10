@@ -4,10 +4,19 @@
 // Week 5 Lab Task - PDO connection using prepared statements
 // ============================================================
 
-define("DB_HOST", getenv("SKILLPROOF_DB_HOST") ?: "localhost");
-define("DB_NAME", getenv("SKILLPROOF_DB_NAME") ?: "skillproof_db");
-define("DB_USER", getenv("SKILLPROOF_DB_USER") ?: "root");
-define("DB_PASS", getenv("SKILLPROOF_DB_PASS") ?: "");
+// For shared hosting, create db_config.local.php from db_config.example.php.
+// The local config is ignored by Git and blocked from public HTTP access.
+// Environment variables take precedence when available.
+$localConfigFile = __DIR__ . "/db_config.local.php";
+$dbConfig = is_file($localConfigFile) ? require $localConfigFile : [];
+if (!is_array($dbConfig)) {
+    http_response_code(500);
+    exit("Invalid database configuration.");
+}
+define("DB_HOST", getenv("SKILLPROOF_DB_HOST") ?: ($dbConfig["host"] ?? "localhost"));
+define("DB_NAME", getenv("SKILLPROOF_DB_NAME") ?: ($dbConfig["name"] ?? "skillproof_db"));
+define("DB_USER", getenv("SKILLPROOF_DB_USER") ?: ($dbConfig["user"] ?? "root"));
+define("DB_PASS", getenv("SKILLPROOF_DB_PASS") ?: ($dbConfig["password"] ?? ""));
 
 function skillproof_db(): PDO {
     static $pdo = null;

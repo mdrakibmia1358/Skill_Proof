@@ -24,6 +24,11 @@ if (ini_get("session.use_cookies")) {
 session_unset();
 session_destroy();
 
-header("Location: login.php?msg=You have logged out successfully and your session was securely cleared");
+// Keep feedback in a fresh anonymous session after clearing authentication.
+session_id("");
+session_start();
+$_SESSION["login_flash"] = "You have logged out successfully and your session was securely cleared";
+
+header("Location: login.php");
 exit();
 ?>
