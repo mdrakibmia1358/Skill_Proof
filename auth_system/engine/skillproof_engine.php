@@ -16,6 +16,42 @@ function sp_ends_with_text($text, $ending) {
     return substr($text, -strlen($ending)) === $ending;
 }
 
+// Keep transport failures distinct from an optional resource being absent.
+function sp_api_response($response, $httpCode, $networkError = false) {
+    $errorType = "";
+    $error = "";
+    $data = null;
+
+    if ($response === false || $networkError || $httpCode === 0) {
+        $errorType = "network";
+        $error = "GitHub connection failed. Please try again later.";
+    } elseif ($httpCode === 404) {
+        $errorType = "not_found";
+        $error = "Required GitHub user or repository data was not found.";
+    } elseif ($httpCode === 403 || $httpCode === 429) {
+        $errorType = "rate_limit";
+        $error = "GitHub API access was denied or rate limited (HTTP " . $httpCode . "). Please try again later.";
+    } elseif ($httpCode < 200 || $httpCode >= 300) {
+        $errorType = "http";
+        $error = "GitHub API request failed (HTTP " . $httpCode . "). Please try again later.";
+    } else {
+        $data = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
+            $errorType = "invalid_response";
+            $error = "GitHub returned invalid data. Please try again later.";
+            $data = null;
+        }
+    }
+
+    return [
+        "ok" => $errorType === "",
+        "data" => $data,
+        "error" => $error,
+        "http_status" => $httpCode,
+        "error_type" => $errorType
+    ];
+}
+
 function sp_api_get($url) {
     $headers = [
         "Accept: application/vnd.github+json",
@@ -23,14 +59,12 @@ function sp_api_get($url) {
     ];
 
     $token = getenv("GITHUB_TOKEN");
-
     if (!empty($token)) {
         $headers[] = "Authorization: Bearer " . $token;
     }
 
     if (function_exists("curl_init")) {
         $ch = curl_init();
-
         curl_setopt_array($ch, [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
@@ -38,116 +72,79 @@ function sp_api_get($url) {
             CURLOPT_TIMEOUT => 25,
             CURLOPT_HTTPHEADER => $headers
         ]);
-
         $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
-
-        curl_close($ch);
-
-        if ($response === false || !empty($error)) {
-            return [
-                "ok" => false,
-                "data" => null,
-                "error" => "GitHub connection failed."
-            ];
-        }
-
-        if ($httpCode === 404) {
-            return [
-                "ok" => false,
-                "data" => null,
-                "error" => "GitHub user or repository data not found."
-            ];
-        }
-
-        if ($httpCode === 403 || $httpCode === 429) {
-            return [
-                "ok" => false,
-                "data" => null,
-                "error" => "GitHub API rate limit reached. Please wait a few minutes and try again."
-            ];
-        }
-
-        if ($httpCode < 200 || $httpCode >= 300) {
-            return [
-                "ok" => false,
-                "data" => null,
-                "error" => "GitHub API request failed (HTTP " . $httpCode . "). Please try again later."
-            ];
-        }
-
-        return [
-            "ok" => true,
-            "data" => json_decode($response, true),
-            "error" => ""
-        ];
-    }
-
-    $headerText = "";
-
-    foreach ($headers as $header) {
-        $headerText .= $header . "\r\n";
+        // PHP 8 frees CurlHandle objects automatically; curl_close is deprecated in 8.5.
+        if (PHP_VERSION_ID < 80000) curl_close($ch);
+        return sp_api_response($response, $httpCode, $error !== "");
     }
 
     $context = stream_context_create([
         "http" => [
             "method" => "GET",
-            "header" => $headerText,
+            "header" => implode("\r\n", $headers) . "\r\n",
             "timeout" => 25,
-            "ignore_errors" => true
+            "ignore_errors" => true,
+            // Match cURL: do not follow redirects carrying the Authorization header.
+            "follow_location" => 0
         ]
     ]);
-
     $response = @file_get_contents($url, false, $context);
-
-    if ($response === false) {
-        return [
-            "ok" => false,
-            "data" => null,
-            "error" => "GitHub connection failed."
-        ];
-    }
-
-    $httpCode = 200;
-
-    if (isset($http_response_header[0])) {
-        preg_match("{HTTP/\S+\s(\d{3})}", $http_response_header[0], $match);
-
-        if (isset($match[1])) {
+    $responseHeaders = function_exists("http_get_last_response_headers")
+        ? (http_get_last_response_headers() ?? [])
+        : ($http_response_header ?? []);
+    $httpCode = 0;
+    foreach ($responseHeaders as $header) {
+        if (preg_match("{^HTTP/\\S+\\s(\\d{3})}", $header, $match)) {
             $httpCode = (int) $match[1];
         }
     }
+    return sp_api_response($response, $httpCode);
+}
 
-    if ($httpCode === 404) {
-        return [
-            "ok" => false,
-            "data" => null,
-            "error" => "GitHub user or repository data not found."
-        ];
+// Validate evidence before scoring it; a malformed success response is not absence.
+function sp_api_data_valid($data, $kind) {
+    if (!is_array($data)) return false;
+    if ($kind === "profile") return isset($data["login"]) && is_string($data["login"]);
+    if ($kind === "readme") return isset($data["path"]) && is_string($data["path"]);
+    if ($kind === "languages") {
+        foreach ($data as $language => $bytes) {
+            if (!is_string($language) || !is_int($bytes) || $bytes < 0) return false;
+        }
+        return true;
     }
-
-    if ($httpCode === 403 || $httpCode === 429) {
-        return [
-            "ok" => false,
-            "data" => null,
-            "error" => "GitHub API rate limit reached. Please wait a few minutes and try again."
-        ];
+    if ($data !== [] && array_keys($data) !== range(0, count($data) - 1)) return false;
+    foreach ($data as $item) {
+        if (!is_array($item) || !isset($item["name"]) || !is_string($item["name"]) || $item["name"] === "") return false;
+        if ($kind === "contents" && (!isset($item["path"]) || !is_string($item["path"]))) return false;
+        if ($kind === "repos") {
+            if (!isset($item["fork"]) || !is_bool($item["fork"])) return false;
+            foreach (["stargazers_count", "forks_count"] as $field) {
+                if (!isset($item[$field]) || !is_int($item[$field]) || $item[$field] < 0) return false;
+            }
+            foreach (["description", "language"] as $field) {
+                if (!array_key_exists($field, $item) || ($item[$field] !== null && !is_string($item[$field]))) return false;
+            }
+            if (!isset($item["updated_at"]) || !is_string($item["updated_at"]) || strtotime($item["updated_at"]) === false) return false;
+            if (!array_key_exists("license", $item) || ($item["license"] !== null && !is_array($item["license"]))) return false;
+            if (!isset($item["topics"]) || !is_array($item["topics"])) return false;
+        }
     }
+    return true;
+}
 
-    if ($httpCode < 200 || $httpCode >= 300) {
-        return [
-            "ok" => false,
-            "data" => null,
-            "error" => "GitHub API request failed (HTTP " . $httpCode . "). Please try again later."
-        ];
+function sp_api_evidence($url, $kind, $optional = false) {
+    $result = sp_api_get($url);
+    if (!$result["ok"]) {
+        // Only README and workflow absence are optional. Required 404s fail closed.
+        if ($optional && $result["error_type"] === "not_found") return null;
+        throw new RuntimeException($result["error"]);
     }
-
-    return [
-        "ok" => true,
-        "data" => json_decode($response, true),
-        "error" => ""
-    ];
+    if (!sp_api_data_valid($result["data"], $kind)) {
+        throw new RuntimeException("GitHub returned incomplete repository data. Please try again later.");
+    }
+    return $result["data"];
 }
 
 function sp_skill_level($score) {
@@ -288,14 +285,17 @@ function skillproof_analyze_github_user($username) {
     $username = trim($username);
     if ($username === "") return sp_make_default_result();
 
-    $profileResult = sp_api_get("https://api.github.com/users/" . rawurlencode($username));
-    if (!$profileResult["ok"]) return sp_make_default_result($username, $profileResult["error"]);
+    try {
+        return sp_analyze_github_evidence($username);
+    } catch (RuntimeException $e) {
+        // No partial scores can escape as a successful analysis.
+        return sp_make_default_result($username, $e->getMessage());
+    }
+}
 
-    $repoResult = sp_api_get("https://api.github.com/users/" . rawurlencode($username) . "/repos?per_page=100&sort=updated");
-    if (!$repoResult["ok"]) return sp_make_default_result($username, $repoResult["error"]);
-
-    $profile = $profileResult["data"];
-    $repos = is_array($repoResult["data"]) ? $repoResult["data"] : [];
+function sp_analyze_github_evidence($username) {
+    $profile = sp_api_evidence("https://api.github.com/users/" . rawurlencode($username), "profile");
+    $repos = sp_api_evidence("https://api.github.com/users/" . rawurlencode($username) . "/repos?per_page=100&sort=updated", "repos");
     $totalRepositories = count($repos);
     if ($totalRepositories === 0) return sp_make_no_repo_result($username, $profile);
 
@@ -348,50 +348,50 @@ function skillproof_analyze_github_user($username) {
 
     foreach ($sampleRepos as $repo) {
         $repoName = $repo["name"] ?? "";
-        if ($repoName === "") continue;
-
         $base = "https://api.github.com/repos/" . rawurlencode($username) . "/" . rawurlencode($repoName);
 
-        $languageResult = sp_api_get($base . "/languages");
-        if ($languageResult["ok"] && is_array($languageResult["data"])) {
-            foreach ($languageResult["data"] as $language => $bytes) {
-                if (!isset($languages[$language])) $languages[$language] = 0;
-                if (!isset($languageRepoNames[$language])) $languageRepoNames[$language] = [];
-                $languages[$language] += (int)$bytes;
-                $languageRepoNames[$language][$repoName] = true;
-            }
+        $languageData = sp_api_evidence($base . "/languages", "languages");
+        foreach ($languageData as $language => $bytes) {
+            if (!isset($languages[$language])) $languages[$language] = 0;
+            if (!isset($languageRepoNames[$language])) $languageRepoNames[$language] = [];
+            $languages[$language] += (int)$bytes;
+            $languageRepoNames[$language][$repoName] = true;
         }
 
-        $readmeResult = sp_api_get($base . "/readme");
-        if ($readmeResult["ok"]) $readmeCount++;
+        $readmeData = sp_api_evidence($base . "/readme", "readme", true);
+        if ($readmeData !== null) $readmeCount++;
 
-        $contentResult = sp_api_get($base . "/contents");
-        if ($contentResult["ok"] && is_array($contentResult["data"])) {
-            foreach ($contentResult["data"] as $item) {
-                $name = strtolower($item["name"] ?? "");
-                $path = strtolower($item["path"] ?? "");
+        $contents = sp_api_evidence($base . "/contents", "contents");
+        $hasGithubEntry = false;
+        foreach ($contents as $item) {
+            if ($item["name"] === ".github") $hasGithubEntry = true;
+            $name = strtolower($item["name"] ?? "");
+            $path = strtolower($item["path"] ?? "");
 
-                if ($name === ".gitignore") $gitignoreCount++;
-                if ($name === ".env") $envFileCount++;
+            if ($name === ".gitignore") $gitignoreCount++;
+            if ($name === ".env") $envFileCount++;
 
-                if (in_array($name, [
-                    "package.json", "composer.json", "requirements.txt", "pyproject.toml",
-                    "pom.xml", "build.gradle", "vite.config.js", "webpack.config.js",
-                    "next.config.js", "composer.lock", "package-lock.json"
-                ], true)) $configFileCount++;
+            if (in_array($name, [
+                "package.json", "composer.json", "requirements.txt", "pyproject.toml",
+                "pom.xml", "build.gradle", "vite.config.js", "webpack.config.js",
+                "next.config.js", "composer.lock", "package-lock.json"
+            ], true)) $configFileCount++;
 
-                if ($name === "dockerfile" || $name === "docker-compose.yml" || $name === "docker-compose.yaml") $dockerCount++;
+            if ($name === "dockerfile" || $name === "docker-compose.yml" || $name === "docker-compose.yaml") $dockerCount++;
 
-                if (sp_contains_text($name, "test") || sp_contains_text($path, "test") || sp_contains_text($path, "spec") || sp_contains_text($path, "__tests__")) $testEvidenceCount++;
+            if (sp_contains_text($name, "test") || sp_contains_text($path, "test") || sp_contains_text($path, "spec") || sp_contains_text($path, "__tests__")) $testEvidenceCount++;
 
-                if (sp_ends_with_text($name, ".sql") || sp_contains_text($path, "database") || sp_contains_text($path, "migration") || sp_contains_text($path, "schema")) $sqlEvidenceCount++;
+            if (sp_ends_with_text($name, ".sql") || sp_contains_text($path, "database") || sp_contains_text($path, "migration") || sp_contains_text($path, "schema")) $sqlEvidenceCount++;
 
-                if ($name === "security.md" || sp_contains_text($path, "security") || sp_contains_text($name, "dependabot")) $securityFileCount++;
-            }
+            if ($name === "security.md" || sp_contains_text($path, "security") || sp_contains_text($name, "dependabot")) $securityFileCount++;
         }
 
-        $workflowResult = sp_api_get($base . "/contents/.github/workflows");
-        if ($workflowResult["ok"]) $ciCount++;
+        // A complete root listing without .github proves workflows are absent.
+        // At GitHub's 1,000-entry limit the listing may be truncated, so still check.
+        if ($hasGithubEntry || count($contents) >= 1000) {
+            $workflowData = sp_api_evidence($base . "/contents/.github/workflows", "contents", true);
+            if ($workflowData !== null) $ciCount++;
+        }
     }
 
     $repoDenominator = max(1, $totalRepositories);

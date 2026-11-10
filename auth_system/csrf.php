@@ -31,7 +31,8 @@ function sp_csrf_token() {
  * (e.g. session expired) or the submitted token doesn't match.
  */
 function sp_csrf_verify($submitted_token) {
-    if (empty($_SESSION["csrf_token"]) || empty($submitted_token)) {
+    if (!is_string($_SESSION["csrf_token"] ?? null) || !is_string($submitted_token)
+        || $_SESSION["csrf_token"] === "" || $submitted_token === "") {
         return false;
     }
 

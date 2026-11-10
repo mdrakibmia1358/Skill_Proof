@@ -3,7 +3,8 @@ session_start();
 require_once __DIR__ . "/csrf.php";
 
 $error_message = "";
-$success_message = $_GET["msg"] ?? "";
+$success_message = is_string($_SESSION["login_flash"] ?? null) ? $_SESSION["login_flash"] : "";
+unset($_SESSION["login_flash"]);
 $email = "";
 $csrf_token = sp_csrf_token();
 

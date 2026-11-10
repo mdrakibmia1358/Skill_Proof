@@ -23,7 +23,10 @@ if (
 ) {
     session_unset();
     session_destroy();
-    header("Location: login.php?msg=Session timed out due to inactivity");
+    session_id("");
+    session_start();
+    $_SESSION["login_flash"] = "Session timed out due to inactivity";
+    header("Location: login.php");
     exit();
 }
 
@@ -45,106 +48,195 @@ $user_email = $_SESSION["user_email"];
 $user_role = $_SESSION["user_role"] ?? "Developer";
 $login_time = $_SESSION["login_time"] ?? time();
 
-// GitHub identity is locked to the account provided at registration.
-// A developer can re-sync (re-analyze) their own account, but cannot
-// point their profile at someone else's GitHub username.
 $userLookup = $pdo->prepare("SELECT user_id, github_username FROM users WHERE email = ? LIMIT 1");
 $userLookup->execute([$user_email]);
 $userRow = $userLookup->fetch();
 $current_user_id = $userRow ? (int) $userRow["user_id"] : null;
 $github_username = $userRow["github_username"] ?? "";
+$github_error = "";
+$flash = $_SESSION["dashboard_flash"] ?? [];
+unset($_SESSION["dashboard_flash"]);
+$status_message = $flash["message"] ?? "";
+$status_type = $flash["type"] ?? "success";
 
-$analysis = skillproof_analyze_github_user($github_username);
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (!sp_csrf_verify($_POST["csrf_token"] ?? "")) {
+        $status_message = "Your session expired. Please try again.";
+        $status_type = "error";
+    } elseif (($_POST["action"] ?? "") !== "analyze_github") {
+        $status_message = "Invalid dashboard action.";
+        $status_type = "error";
+    } elseif (!$current_user_id || $github_username === "") {
+        $status_message = "Add a GitHub username to your profile before analyzing.";
+        $status_type = "error";
+    } else {
+        // Consume this form token before the API call. A replay cannot run or save again.
+        unset($_SESSION["csrf_token"]);
+        sp_csrf_token();
+        $analysisResult = skillproof_analyze_github_user($github_username);
 
-$github_connected = $analysis["connected"] ?? false;
-$github_error = $analysis["error"] ?? "";
-$profile = $analysis["profile"] ?? null;
-$repoStats = $analysis["repoStats"] ?? [];
-$summaryCards = $analysis["summaryCards"] ?? [];
-$skills = $analysis["skills"] ?? [];
-$dimensions = $analysis["dimensions"] ?? [];
-$learningGaps = $analysis["learningGaps"] ?? [];
-$activities = $analysis["activities"] ?? [];
+        if (!($analysisResult["connected"] ?? false) || !empty($analysisResult["error"] ?? "")) {
+            $status_message = ($analysisResult["error"] ?: "GitHub analysis failed.") . " Your previous result was kept.";
+            $status_type = "error";
+        } else {
+            $repoStats = $analysisResult["repoStats"] ?? [];
+            $skills = $analysisResult["skills"] ?? [];
+            $dimensions = $analysisResult["dimensions"] ?? [];
+            $learningGaps = $analysisResult["learningGaps"] ?? [];
 
-$total_repositories = $repoStats["total"] ?? 0;
-$original_repositories = $repoStats["original"] ?? 0;
-$forked_repositories = $repoStats["forked"] ?? 0;
-$total_stars = $repoStats["stars"] ?? 0;
-$total_forks = $repoStats["forks"] ?? 0;
-$languages_detected = $repoStats["languages_count"] ?? 0;
-$readme_count = $repoStats["readme_count"] ?? 0;
+            try {
+                $pdo->beginTransaction();
+                $insertAnalysis = $pdo->prepare(
+                    "INSERT INTO skill_analyses
+                        (user_id, github_username, total_repositories, original_repositories,
+                        forked_repositories, total_stars, total_forks, languages_detected, readme_count,
+                        trust_score, career_score)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                );
+                $insertAnalysis->execute([
+                    $current_user_id, $github_username, $repoStats["total"] ?? 0,
+                    $repoStats["original"] ?? 0, $repoStats["forked"] ?? 0,
+                    $repoStats["stars"] ?? 0, $repoStats["forks"] ?? 0,
+                    $repoStats["languages_count"] ?? 0, $repoStats["readme_count"] ?? 0,
+                    $analysisResult["scores"]["trust"] ?? 0, $analysisResult["scores"]["career"] ?? 0
+                ]);
+                $newAnalysisId = (int) $pdo->lastInsertId();
 
-$masked_session_id = session_id() !== ""
-    ? substr(session_id(), 0, 8) . "••••••••"
-    : "Unavailable";
-    require_once __DIR__ . "/db_connect.php";
-    $pdo = skillproof_db();
+                $insertSkill = $pdo->prepare(
+                    "INSERT INTO skill_scores (analysis_id, skill_name, score, level, evidence, status) VALUES (?, ?, ?, ?, ?, ?)"
+                );
+                foreach ($skills as $skill) {
+                    $insertSkill->execute([
+                        $newAnalysisId, $skill["name"] ?? "", $skill["score"] ?? 0,
+                        $skill["level"] ?? "", $skill["evidence"] ?? "",
+                        $skill["status"] ?? "Not Detected"
+                    ]);
+                }
 
-    if ($_SERVER["REQUEST_METHOD"] === "POST" && sp_csrf_verify($_POST["csrf_token"] ?? "") && $current_user_id && $github_connected && empty($github_error)) {
-        $trust_score = $analysis["scores"]["trust"] ?? 0;
-        $career_score = $analysis["scores"]["career"] ?? 0;
+                $insertDimension = $pdo->prepare(
+                    "INSERT INTO dimension_scores (analysis_id, dimension_name, score, evidence) VALUES (?, ?, ?, ?)"
+                );
+                foreach ($dimensions as $dimension) {
+                    $insertDimension->execute([
+                        $newAnalysisId, $dimension["name"] ?? "", $dimension["score"] ?? 0,
+                        $dimension["evidence"] ?? ""
+                    ]);
+                }
 
-        $insertAnalysis = $pdo->prepare(
-            "INSERT INTO skill_analyses
-                (user_id, github_username, total_repositories, original_repositories,
-                forked_repositories, total_stars, total_forks, languages_detected, readme_count,
-                trust_score, career_score)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        );    
-        $insertAnalysis->execute([
-            $current_user_id, $github_username, $total_repositories, $original_repositories,
-            $forked_repositories, $total_stars, $total_forks, $languages_detected, $readme_count,
-            $trust_score, $career_score
-        ]);
-        $newAnalysisId = (int) $pdo->lastInsertId();
+                $insertGap = $pdo->prepare(
+                    "INSERT INTO learning_gaps (analysis_id, title, description, priority) VALUES (?, ?, ?, ?)"
+                );
+                foreach ($learningGaps as $gap) {
+                    $insertGap->execute([
+                        $newAnalysisId, $gap["title"] ?? "",
+                        $gap["text"] ?? ($gap["description"] ?? ""),
+                        $gap["priority"] ?? "Low Priority"
+                    ]);
+                }
+                $pdo->commit();
+                $status_message = "GitHub analysis saved successfully.";
+                $status_type = "success";
+            } catch (PDOException $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                error_log("SkillProof dashboard analysis save failed: " . $e->getMessage());
+                $status_message = "The analysis could not be saved. Your previous result was kept.";
+                $status_type = "error";
+            }
+        }
+    }
+    $_SESSION["dashboard_flash"] = ["message" => $status_message, "type" => $status_type];
+    header("Location: dashboard.php#github", true, 303);
+    exit();
+}
 
-        $insertSkill = $pdo->prepare(
-            "INSERT INTO skill_scores (analysis_id, skill_name, score, level, evidence, status) VALUES (?, ?, ?, ?, ?, ?)"
-        );
-        foreach ($skills as $skill) {
-            $insertSkill->execute([
-                $newAnalysisId,
-                $skill["name"] ?? "",
-                $skill["score"] ?? 0,
-                $skill["level"] ?? "",
-                $skill["evidence"] ?? "",
-                $skill["status"] ?? "Not Detected",
-            ]);
-        }   
-        $insertDimension = $pdo->prepare(
-            "INSERT INTO dimension_scores (analysis_id, dimension_name, score, evidence) VALUES (?, ?, ?, ?)"
-        );
-        foreach ($dimensions as $dimension) {
-            $insertDimension->execute([
-                $newAnalysisId,
-                $dimension["name"] ?? "",
-                $dimension["score"] ?? 0,
-                $dimension["evidence"] ?? "",
-            ]);
+$latestAnalysis = null;
+$skills = [];
+$dimensions = [];
+$learningGaps = [];
+$analysisHistory = [];
+if ($current_user_id) {
+    $latestStmt = $pdo->prepare("SELECT * FROM skill_analyses WHERE user_id = ? ORDER BY analyzed_at DESC, analysis_id DESC LIMIT 1");
+    $latestStmt->execute([$current_user_id]);
+    $latestAnalysis = $latestStmt->fetch(PDO::FETCH_ASSOC) ?: null;
+
+    if ($latestAnalysis) {
+        $skillStmt = $pdo->prepare("SELECT skill_name, score, level, evidence, status FROM skill_scores WHERE analysis_id = ? ORDER BY score DESC, skill_name ASC");
+        $skillStmt->execute([$latestAnalysis["analysis_id"]]);
+        foreach ($skillStmt->fetchAll(PDO::FETCH_ASSOC) as $skill) {
+            $skills[] = [
+                "name" => $skill["skill_name"], "score" => (int) $skill["score"],
+                "level" => $skill["level"], "evidence" => $skill["evidence"],
+                "status" => $skill["status"]
+            ];
         }
 
-        $insertGap = $pdo->prepare(
-            "INSERT INTO learning_gaps (analysis_id, title, description, priority) VALUES (?, ?, ?, ?)"
-        );
-        foreach ($learningGaps as $gap) {
-            $insertGap->execute([
-                $newAnalysisId,
-                $gap["title"] ?? "",
-                $gap["text"] ?? ($gap["description"] ?? ""),
-                $gap["priority"] ?? "Low Priority",
-            ]);
+        $dimensionStmt = $pdo->prepare("SELECT dimension_name, score, evidence FROM dimension_scores WHERE analysis_id = ? ORDER BY dimension_id ASC");
+        $dimensionStmt->execute([$latestAnalysis["analysis_id"]]);
+        foreach ($dimensionStmt->fetchAll(PDO::FETCH_ASSOC) as $dimension) {
+            $dimensions[] = [
+                "name" => $dimension["dimension_name"], "score" => (int) $dimension["score"],
+                "evidence" => $dimension["evidence"]
+            ];
+        }
+
+        $gapStmt = $pdo->prepare("SELECT title, description, priority FROM learning_gaps WHERE analysis_id = ? ORDER BY gap_id ASC");
+        $gapStmt->execute([$latestAnalysis["analysis_id"]]);
+        foreach ($gapStmt->fetchAll(PDO::FETCH_ASSOC) as $gap) {
+            $learningGaps[] = [
+                "title" => $gap["title"], "text" => $gap["description"], "priority" => $gap["priority"]
+            ];
         }
     }
 
-    $analysisHistory = [];
-    if ($current_user_id) {
-        $historyStmt = $pdo->prepare(
-            "SELECT github_username, total_repositories, total_stars, analyzed_at
-            FROM skill_analyses WHERE user_id = ? ORDER BY analyzed_at DESC LIMIT 5"
-        );
-        $historyStmt->execute([$current_user_id]);
-        $analysisHistory = $historyStmt->fetchAll();
-    }             
+    $historyStmt = $pdo->prepare(
+        "SELECT github_username, total_repositories, total_stars, analyzed_at
+        FROM skill_analyses WHERE user_id = ? ORDER BY analyzed_at DESC, analysis_id DESC LIMIT 5"
+    );
+    $historyStmt->execute([$current_user_id]);
+    $analysisHistory = $historyStmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+$has_saved_analysis = $latestAnalysis !== null;
+$github_connected = $has_saved_analysis && $latestAnalysis["github_username"] === $github_username;
+$analysis_username_changed = $has_saved_analysis && !$github_connected;
+$repoStats = [
+    "total" => (int) ($latestAnalysis["total_repositories"] ?? 0),
+    "original" => (int) ($latestAnalysis["original_repositories"] ?? 0),
+    "forked" => (int) ($latestAnalysis["forked_repositories"] ?? 0),
+    "stars" => (int) ($latestAnalysis["total_stars"] ?? 0),
+    "forks" => (int) ($latestAnalysis["total_forks"] ?? 0),
+    "languages_count" => (int) ($latestAnalysis["languages_detected"] ?? 0),
+    "readme_count" => (int) ($latestAnalysis["readme_count"] ?? 0)
+];
+$dimensionScores = [];
+foreach ($dimensions as $dimension) {
+    $dimensionScores[$dimension["name"]] = $dimension["score"];
+}
+$verifiedSkills = 0;
+foreach ($skills as $skill) {
+    if ($skill["score"] >= 60) {
+        $verifiedSkills++;
+    }
+}
+$summaryCards = [
+    ["title" => "Trust Score", "value" => (int) ($latestAnalysis["trust_score"] ?? 0) . "%", "note" => $has_saved_analysis ? "Saved analysis result" : "Not analyzed yet", "color" => $has_saved_analysis ? "text-green-700 bg-green-50" : "text-slate-500 bg-slate-100"],
+    ["title" => "Career Readiness", "value" => (int) ($latestAnalysis["career_score"] ?? 0) . "%", "note" => $has_saved_analysis ? "Based on saved evidence" : "Not analyzed yet", "color" => $has_saved_analysis ? "text-blue-800 bg-blue-50" : "text-slate-500 bg-slate-100"],
+    ["title" => "Repository Quality", "value" => (int) ($dimensionScores["Repository Quality"] ?? 0) . "%", "note" => $has_saved_analysis ? "Saved repository analysis" : "Not analyzed yet", "color" => $has_saved_analysis ? "text-indigo-800 bg-indigo-50" : "text-slate-500 bg-slate-100"],
+    ["title" => "Verified Skills", "value" => $verifiedSkills, "note" => $has_saved_analysis ? "Skills above threshold" : "Not analyzed yet", "color" => $has_saved_analysis ? "text-green-700 bg-green-50" : "text-slate-500 bg-slate-100"]
+];
+if (!$has_saved_analysis) {
+    require_once __DIR__ . "/engine/skillproof_engine.php";
+    $defaultResult = sp_make_default_result($github_username);
+    $skills = $defaultResult["skills"];
+    $dimensions = $defaultResult["dimensions"];
+    $learningGaps = $defaultResult["learningGaps"];
+}
+$activities = $has_saved_analysis
+    ? ["Latest saved analysis: " . ($latestAnalysis["analyzed_at"] ?? "date unavailable") . "."]
+    : ["No GitHub analysis has been saved yet.", "Use Analyze GitHub to create your first result."];
+$masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••••••••" : "Unavailable";
 ?>
 
 <!DOCTYPE html>
@@ -206,22 +298,22 @@ $masked_session_id = session_id() !== ""
         <section id="dashboard" class="p-6 space-y-6">
 
             <div class="bg-gradient-to-r from-blue-900 to-slate-950 text-white rounded-2xl p-8 shadow">
-                <h3 class="text-3xl font-extrabold mb-3">Real-Time Skill Verification</h3>
+                <h3 class="text-3xl font-extrabold mb-3">Saved Skill Verification</h3>
                 <p class="text-blue-100 max-w-4xl leading-relaxed">
-                    SkillProof calculates scores only from connected GitHub public data.
-                    If GitHub is not connected, all score values remain 0.
+                    SkillProof displays your latest saved GitHub analysis. Run a manual sync when
+                    you want to collect fresh public GitHub evidence.
                 </p>
             </div>
 
             <div id="github" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 <h3 class="text-xl font-extrabold">Connect GitHub Account</h3>
                 <p class="text-sm text-slate-500 mt-1">
-                    Enter a public GitHub username to calculate real-time repository, language, and documentation scores.
+                    Your profile username is used for manual analysis. Dashboard loads never contact GitHub.
                 </p>
 
-                <?php if (!empty($github_error)): ?>
-                    <div class="mt-4 bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-xl text-sm">
-                        <?php echo safe_output($github_error); ?>
+                <?php if (!empty($status_message)): ?>
+                    <div class="mt-4 <?php echo $status_type === "error" ? "bg-red-50 border-red-300 text-red-700" : "bg-green-50 border-green-300 text-green-700"; ?> border px-4 py-3 rounded-xl text-sm">
+                        <?php echo safe_output($status_message); ?>
                     </div>
                 <?php endif; ?>
 
@@ -233,6 +325,7 @@ $masked_session_id = session_id() !== ""
                 <?php else: ?>
                     <form method="POST" action="dashboard.php#github" class="mt-5 flex flex-col md:flex-row gap-3">
                         <input type="hidden" name="csrf_token" value="<?php echo safe_output($csrf_token); ?>">
+                        <input type="hidden" name="action" value="analyze_github">
                         <input
                             type="text"
                             value="<?php echo safe_output($github_username); ?>"
@@ -244,7 +337,7 @@ $masked_session_id = session_id() !== ""
                             type="submit"
                             class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold whitespace-nowrap"
                         >
-                            Re-sync GitHub Data
+                            Analyze GitHub
                         </button>
                     </form>
                     <p class="text-xs text-slate-400 mt-2">
@@ -256,11 +349,18 @@ $masked_session_id = session_id() !== ""
                 <div class="mt-4 text-sm">
                     <?php if ($github_connected): ?>
                         <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">
-                            Connected: <?php echo safe_output($github_username); ?>
+                            Saved result for: <?php echo safe_output($github_username); ?>
                         </span>
+                    <?php elseif ($analysis_username_changed): ?>
+                        <div class="bg-amber-50 border border-amber-300 text-amber-700 px-4 py-3 rounded-xl">
+                            Your saved result belongs to
+                            <strong><?php echo safe_output($latestAnalysis["github_username"]); ?></strong>.
+                            Your profile now lists <strong><?php echo safe_output($github_username); ?></strong>;
+                            analyze GitHub to create a new result.
+                        </div>
                     <?php else: ?>
                         <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-bold">
-                            Not Connected
+                            Not analyzed yet
                         </span>
                     <?php endif; ?>
                 </div>
@@ -291,7 +391,7 @@ $masked_session_id = session_id() !== ""
                             <p class="text-sm text-slate-500">Scores are calculated from real GitHub evidence.</p>
                         </div>
                         <span class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full">
-                            Real-Time Data
+                            Saved Data
                         </span>
                     </div>
 
@@ -362,8 +462,8 @@ $masked_session_id = session_id() !== ""
                 </div>
 
                 <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-                    <h3 class="text-xl font-extrabold">Real-Time Activity</h3>
-                    <p class="text-sm text-slate-500 mb-5">Latest dashboard analysis status</p>
+                    <h3 class="text-xl font-extrabold">Saved Analysis Activity</h3>
+                    <p class="text-sm text-slate-500 mb-5">Latest saved analysis status</p>
 
                     <ul class="space-y-4 text-sm text-slate-700">
                         <?php foreach ($activities as $activity): ?>
@@ -380,7 +480,7 @@ $masked_session_id = session_id() !== ""
                 <p class="text-xs uppercase tracking-widest text-blue-700 font-extrabold">Evidence Dimensions</p>
                 <h3 class="text-xl font-extrabold mt-1">Assessment Dimension Scores</h3>
                 <p class="text-sm text-slate-500">
-                    These scores are 0 until GitHub data is connected.
+                    These scores come from the latest saved analysis and remain 0 until you run one.
                 </p>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-5">
@@ -465,7 +565,13 @@ $masked_session_id = session_id() !== ""
 
                 <div class="mt-5 bg-slate-50 rounded-xl p-5 text-sm space-y-2">
                     <p><strong>User Email:</strong> <span class="text-blue-800 font-bold"><?php echo safe_output($user_email); ?></span></p>
-                    <p><strong>GitHub Username:</strong> <?php echo $github_connected ? safe_output($github_username) : "Not Connected"; ?></p>
+                    <p><strong>GitHub Username:</strong>
+                        <?php if ($has_saved_analysis): ?>
+                            <?php echo safe_output($latestAnalysis["github_username"]); ?> (saved result)
+                        <?php else: ?>
+                            Not analyzed yet
+                        <?php endif; ?>
+                    </p>
                     <p><strong>Account Status:</strong> <span class="text-green-700 font-bold">Active and Protected</span></p>
                     <p><strong>Session ID (masked):</strong> <code class="bg-white border px-2 py-1 rounded text-blue-800"><?php echo safe_output($masked_session_id); ?></code></p>
                     <p><strong>Login Time:</strong> <?php echo date("Y-m-d H:i:s", $login_time); ?></p>
