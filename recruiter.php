@@ -46,7 +46,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                         Logout
                     </a>
                 <?php else: ?>
-                    <a href="/auth_system/register.php" class="text-slate-300 hover:text-white">Sign Up</a>
+                    <a href="/auth_system/login.php" class="text-slate-300 hover:text-white">Recruiter Login</a>
                     <a
                         href="/auth_system/login.php"
                         class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition"
@@ -72,7 +72,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 <a href="auth_system/profile.php" class="block py-3 text-slate-300">Profile</a>
                 <a href="auth_system/logout.php" class="block py-3 text-red-300 font-bold">Logout</a>
             <?php else: ?>
-                <a href="/auth_system/register.php" class="block py-3 text-slate-300">Sign Up</a>
+                <a href="/auth_system/login.php" class="block py-3 text-slate-300">Recruiter Login</a>
                 <a href="/auth_system/login.php" class="block py-3 text-blue-300 font-bold">Login</a>
             <?php endif; ?>
         </div>
@@ -98,10 +98,10 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
 
                 <div class="mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-4 text-center">
                     <a
-                        href="<?php echo $is_logged_in ? 'auth_system/dashboard.php' : '/auth_system/register.php'; ?>"
+                        href="<?php echo $is_logged_in ? $dashboard_link : '/auth_system/login.php'; ?>"
                         class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
                     >
-                        Join as Recruiter
+                        Recruiter Login
                     </a>
 
                     <a
@@ -236,10 +236,10 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 </div>
 
                 <a
-                    href="<?php echo $is_logged_in ? 'auth_system/dashboard.php' : '/auth_system/register.php'; ?>"
+                    href="<?php echo $is_logged_in ? $dashboard_link : '/auth_system/login.php'; ?>"
                     class="shrink-0 text-center bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-bold text-sm"
                 >
-                    Request Access
+                    Recruiter Login
                 </a>
             </div>
 
@@ -313,10 +313,10 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                     </a>
                 <?php else: ?>
                     <a
-                        href="/auth_system/register.php"
+                        href="/auth_system/login.php"
                         class="bg-blue-600 hover:bg-blue-500 text-white px-7 py-3 rounded-xl font-bold transition"
                     >
-                        Join as Recruiter
+                        Recruiter Login
                     </a>
 
                     <a
@@ -342,7 +342,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 <?php if ($is_logged_in): ?>
                     <a href="<?php echo $dashboard_link; ?>" class="hover:text-white">Dashboard</a>
                 <?php else: ?>
-                    <a href="/auth_system/register.php" class="hover:text-white">Sign Up</a>
+                    <a href="/auth_system/login.php" class="hover:text-white">Recruiter Login</a>
                     <a href="/auth_system/login.php" class="hover:text-white">Login</a>
                 <?php endif; ?>
             </div>

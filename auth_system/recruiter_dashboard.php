@@ -44,6 +44,13 @@ $_SESSION["last_activity"] = time();
 $user_email = $_SESSION["user_email"];
 $pdo = skillproof_db();
 
+$recruiterStmt = $pdo->prepare("SELECT user_id FROM users WHERE email = ? AND role = 'Recruiter' LIMIT 1");
+$recruiterStmt->execute([$user_email]);
+if (!$recruiterStmt->fetch()) {
+    header("Location: dashboard.php");
+    exit();
+}
+
 // 2. Read filters from the query string (GET so results are shareable/bookmarkable).
 $skillFilter = trim($_GET["skill"] ?? "");
 $minTrust    = isset($_GET["min_trust"]) && $_GET["min_trust"] !== "" ? max(0, min(100, (int) $_GET["min_trust"])) : 0;
