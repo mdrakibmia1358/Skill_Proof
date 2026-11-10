@@ -933,3 +933,34 @@ td {
     padding: 2rem;
   }
 }
+
+/* The legacy login demo uses this local stylesheet instead of Tailwind. */
+@media (max-width: 639px) {
+  .dashboard-wrapper {
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .banner-section,
+  .form-card {
+    min-width: 0;
+    padding: 1.25rem;
+    overflow-wrap: anywhere;
+  }
+
+  .form-group input,
+  .form-group select {
+    min-width: 0;
+    font-size: 16px;
+  }
+
+  .app-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .app-footer {
+    padding: 1.5rem 1rem;
+    overflow-wrap: anywhere;
+  }
+}

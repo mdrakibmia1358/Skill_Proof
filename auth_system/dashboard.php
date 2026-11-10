@@ -245,14 +245,15 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillProof - Developer Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=20261110">
+    <script src="../assets/js/navigation.js?v=20261110" defer></script>
 </head>
 
 <body class="bg-slate-100 text-slate-900">
 
 <div class="min-h-screen flex">
 
-    <aside class="w-64 bg-slate-950 text-white fixed top-0 left-0 h-full hidden lg:flex flex-col">
+    <aside class="w-64 bg-slate-950 text-white fixed top-0 left-0 h-full hidden lg:flex flex-col overflow-y-auto">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-2xl font-extrabold">SkillProof</h1>
             <p class="text-xs text-slate-400 mt-1">Evidence-based developer assessment</p>
@@ -279,14 +280,35 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
         </div>
     </aside>
 
-    <main class="flex-1 lg:ml-64">
+    <main class="min-w-0 flex-1 lg:ml-64">
 
-        <header class="bg-white border-b border-slate-200 px-6 py-5 flex items-center justify-between">
+        <div class="lg:hidden bg-slate-950 text-white">
+            <div class="px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+                <a href="../home.php" class="text-xl font-extrabold">SkillProof</a>
+                <button id="menuButton" type="button" aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle dashboard navigation" data-menu-breakpoint="1024" class="min-h-11 bg-slate-800 px-4 py-2 rounded-lg text-sm font-bold">Menu</button>
+            </div>
+            <nav id="mobileMenu" aria-label="Dashboard navigation" class="hidden lg:hidden border-t border-slate-800 p-4 space-y-2 text-sm">
+                <a href="../home.php" class="block px-4 py-3 rounded-lg hover:bg-slate-800 mb-2 border-b border-slate-800 pb-4">
+                    &larr; Back to Home
+                </a>
+                <a href="#dashboard" class="block px-4 py-3 rounded-lg bg-blue-600 font-bold">Dashboard</a>
+                <a href="#github" class="block px-4 py-3 rounded-lg hover:bg-slate-800">GitHub Connection</a>
+                <a href="#skills" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Skill Verification</a>
+                <a href="#dimensions" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Score Dimensions</a>
+                <a href="#gaps" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Learning Gap</a>
+                <a href="#history" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Analysis History</a>
+                <a href="#security" class="block px-4 py-3 rounded-lg hover:bg-slate-800">Account Security</a>
+                <a href="profile.php" class="block px-4 py-3 rounded-lg hover:bg-slate-800 border-t border-slate-800 mt-2 pt-4">My Profile</a>
+                <a href="logout.php" class="block px-4 py-3 rounded-lg bg-red-600 hover:bg-red-500 font-bold">Logout</a>
+            </nav>
+        </div>
+
+        <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h2 class="text-2xl font-extrabold text-slate-950">Developer Dashboard</h2>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-slate-950">Developer Dashboard</h2>
                 <p class="text-sm text-slate-500">
                     Welcome,
-                    <span class="font-bold text-blue-700"><?php echo safe_output($user_email); ?></span>
+                    <span class="font-bold text-blue-700 break-all"><?php echo safe_output($user_email); ?></span>
                 </p>
             </div>
 
@@ -295,17 +317,17 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
             </span>
         </header>
 
-        <section id="dashboard" class="p-6 space-y-6">
+        <section id="dashboard" class="p-4 sm:p-6 space-y-6">
 
-            <div class="bg-gradient-to-r from-blue-900 to-slate-950 text-white rounded-2xl p-8 shadow">
-                <h3 class="text-3xl font-extrabold mb-3">Saved Skill Verification</h3>
+            <div class="bg-gradient-to-r from-blue-900 to-slate-950 text-white rounded-2xl p-5 sm:p-8 shadow">
+                <h3 class="text-2xl sm:text-3xl font-extrabold mb-3">Saved Skill Verification</h3>
                 <p class="text-blue-100 max-w-4xl leading-relaxed">
                     SkillProof displays your latest saved GitHub analysis. Run a manual sync when
                     you want to collect fresh public GitHub evidence.
                 </p>
             </div>
 
-            <div id="github" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <div id="github" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                 <h3 class="text-xl font-extrabold">Connect GitHub Account</h3>
                 <p class="text-sm text-slate-500 mt-1">
                     Your profile username is used for manual analysis. Dashboard loads never contact GitHub.
@@ -330,7 +352,7 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
                             type="text"
                             value="<?php echo safe_output($github_username); ?>"
                             readonly
-                            class="flex-1 px-4 py-3 border border-slate-200 bg-slate-100 text-slate-500 rounded-xl cursor-not-allowed"
+                            class="min-w-0 w-full flex-1 px-4 py-3 border border-slate-200 bg-slate-100 text-slate-500 rounded-xl cursor-not-allowed"
                         >
 
                         <button
@@ -348,7 +370,7 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
 
                 <div class="mt-4 text-sm">
                     <?php if ($github_connected): ?>
-                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">
+                        <span class="inline-block max-w-full break-words bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">
                             Saved result for: <?php echo safe_output($github_username); ?>
                         </span>
                     <?php elseif ($analysis_username_changed): ?>
@@ -368,7 +390,7 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
 
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 <?php foreach ($summaryCards as $card): ?>
-                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                         <p class="text-xs font-bold uppercase tracking-wide text-slate-500">
                             <?php echo safe_output($card["title"]); ?>
                         </p>
@@ -385,7 +407,7 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-6" id="skills">
 
                 <div class="xl:col-span-2 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <div class="p-4 sm:p-6 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
                         <div>
                             <h3 class="text-xl font-extrabold">Skill Score Matrix</h3>
                             <p class="text-sm text-slate-500">Scores are calculated from real GitHub evidence.</p>
@@ -395,8 +417,8 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
                         </span>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
+                    <div class="overflow-x-auto" role="region" aria-label="Skill scores; scroll horizontally to see all columns" tabindex="0">
+                        <table class="w-full min-w-[640px] text-sm">
                             <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
                                 <tr>
                                     <th class="text-left px-5 py-3">Skill</th>
@@ -461,14 +483,14 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
                     </div>
                 </div>
 
-                <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                     <h3 class="text-xl font-extrabold">Saved Analysis Activity</h3>
                     <p class="text-sm text-slate-500 mb-5">Latest saved analysis status</p>
 
                     <ul class="space-y-4 text-sm text-slate-700">
                         <?php foreach ($activities as $activity): ?>
                             <li class="flex gap-3">
-                                <span class="w-2 h-2 rounded-full bg-blue-600 mt-2"></span>
+                                <span class="w-2 h-2 shrink-0 rounded-full bg-blue-600 mt-2"></span>
                                 <span><?php echo safe_output($activity); ?></span>
                             </li>
                         <?php endforeach; ?>
@@ -476,7 +498,7 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
                 </div>
             </div>
 
-            <div id="dimensions" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <div id="dimensions" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                 <p class="text-xs uppercase tracking-widest text-blue-700 font-extrabold">Evidence Dimensions</p>
                 <h3 class="text-xl font-extrabold mt-1">Assessment Dimension Scores</h3>
                 <p class="text-sm text-slate-500">
@@ -486,9 +508,9 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-5">
                     <?php foreach ($dimensions as $dimension): ?>
                         <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <h4 class="font-extrabold"><?php echo safe_output($dimension["name"]); ?></h4>
-                                <span class="text-blue-800 font-extrabold">
+                                <span class="shrink-0 text-blue-800 font-extrabold">
                                     <?php echo safe_output($dimension["score"]); ?>%
                                 </span>
                             </div>
@@ -505,16 +527,16 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
                 </div>
             </div>
 
-            <div id="gaps" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <div id="gaps" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                 <p class="text-xs uppercase tracking-widest text-blue-700 font-extrabold">Learning Gap</p>
                 <h3 class="text-xl font-extrabold mt-1">Recommended Improvements</h3>
 
                 <div class="mt-5 space-y-4">
                     <?php foreach ($learningGaps as $gap): ?>
                         <div class="border border-slate-200 rounded-xl p-4 bg-slate-50">
-                            <div class="flex items-center justify-between gap-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                                 <h4 class="font-extrabold"><?php echo safe_output($gap["title"]); ?></h4>
-                                <span class="text-xs bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full font-bold whitespace-nowrap">
+                                <span class="self-start text-xs bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full font-bold whitespace-nowrap">
                                     <?php echo safe_output($gap["priority"]); ?>
                                 </span>
                             </div>
@@ -526,44 +548,46 @@ $masked_session_id = session_id() !== "" ? substr(session_id(), 0, 8) . "••�
                 </div>
             </div>
             
-            <div id="history" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <div id="history" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                 <p class="text-xs uppercase tracking-widest text-blue-700 font-extrabold">Analysis History</p>
                 <h3 class="text-xl font-extrabold mt-1">Past GitHub Analysis Runs</h3>
                 <p class="text-sm text-slate-500 mb-4">Your last 5 analysis runs saved to the database.</p>
                 <?php if (empty($analysisHistory)): ?>
                     <p class="text-sm text-slate-400">No analysis history yet. Run an analysis above to see it here.</p>
                 <?php else: ?>
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-slate-200 text-left text-slate-500">
-                                <th class="py-2">GitHub Username</th>
-                                <th class="py-2">Repositories</th>
-                                <th class="py-2">Stars</th>
-                                <th class="py-2">Analyzed At</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($analysisHistory as $entry): ?>
-                                <tr class="border-b border-slate-100">
-                                    <td class="py-2 font-bold"><?php echo safe_output($entry["github_username"]); ?></td>
-                                    <td class="py-2"><?php echo safe_output($entry["total_repositories"]); ?></td>
-                                    <td class="py-2"><?php echo safe_output($entry["total_stars"]); ?></td>
-                                    <td class="py-2"><?php echo safe_output($entry["analyzed_at"]); ?></td>
+                    <div class="overflow-x-auto" role="region" aria-label="Analysis history; scroll horizontally to see all columns" tabindex="0">
+                        <table class="w-full min-w-[560px] text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-left text-slate-500">
+                                    <th class="py-2">GitHub Username</th>
+                                    <th class="py-2">Repositories</th>
+                                    <th class="py-2">Stars</th>
+                                    <th class="py-2">Analyzed At</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($analysisHistory as $entry): ?>
+                                    <tr class="border-b border-slate-100">
+                                        <td class="py-2 font-bold"><?php echo safe_output($entry["github_username"]); ?></td>
+                                        <td class="py-2"><?php echo safe_output($entry["total_repositories"]); ?></td>
+                                        <td class="py-2"><?php echo safe_output($entry["total_stars"]); ?></td>
+                                        <td class="py-2"><?php echo safe_output($entry["analyzed_at"]); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 <?php endif; ?>
             </div>
 
 
-            <div id="security" class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <div id="security" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                 <h3 class="text-xl font-extrabold">Account Protection Details</h3>
                 <p class="text-sm text-slate-500 mt-1">
                     This section proves that the dashboard is protected by PHP session data.
                 </p>
 
-                <div class="mt-5 bg-slate-50 rounded-xl p-5 text-sm space-y-2">
+                <div class="mt-5 bg-slate-50 rounded-xl p-4 sm:p-5 text-sm space-y-2 break-words">
                     <p><strong>User Email:</strong> <span class="text-blue-800 font-bold"><?php echo safe_output($user_email); ?></span></p>
                     <p><strong>GitHub Username:</strong>
                         <?php if ($has_saved_analysis): ?>

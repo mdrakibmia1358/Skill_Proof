@@ -9,16 +9,17 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillProof - Verified Skills</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/tailwind.css?v=20261110">
+    <script src="assets/js/navigation.js?v=20261110" defer></script>
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans">
 
     <!-- Navigation -->
     <header class="bg-slate-950 text-white sticky top-0 z-50 shadow-lg">
-        <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <nav aria-label="Main navigation" class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
 
-            <a href="home.php" class="flex items-center gap-3">
+            <a href="home.php" class="flex shrink-0 items-center gap-3">
                 <div class="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
                     <span class="text-white font-extrabold text-lg">SP</span>
                 </div>
@@ -29,7 +30,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 </div>
             </a>
 
-            <div class="hidden md:flex items-center gap-8 text-sm">
+            <div class="hidden lg:flex items-center gap-8 text-sm">
                 <a href="home.php" class="text-slate-300 hover:text-white">Home</a>
                 <a href="home.php#features" class="text-slate-300 hover:text-white">Features</a>
                 <a href="home.php#process" class="text-slate-300 hover:text-white">How It Works</a>
@@ -55,38 +56,38 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 <?php endif; ?>
             </div>
 
-            <button id="menuButton" class="md:hidden bg-slate-800 px-3 py-2 rounded-lg text-sm">
+            <button id="menuButton" type="button" data-menu-breakpoint="1024" aria-controls="mobileMenu" aria-expanded="false" class="lg:hidden shrink-0 min-h-[44px] bg-slate-800 px-3 py-2 rounded-lg text-sm">
                 Menu
             </button>
         </nav>
 
-        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 px-6 pb-4 space-y-2 text-sm">
-            <a href="home.php" class="block py-2 text-slate-300">Home</a>
-            <a href="home.php#features" class="block py-2 text-slate-300">Features</a>
-            <a href="home.php#process" class="block py-2 text-slate-300">How It Works</a>
-            <a href="skills.php" class="block py-2 text-white font-semibold">Skills</a>
-            <a href="recruiter.php" class="block py-2 text-slate-300">Recruiters</a>
+        <div id="mobileMenu" class="hidden lg:hidden max-h-[calc(100dvh-80px)] overflow-y-auto border-t border-slate-800 px-4 sm:px-6 pb-4 space-y-2 text-sm">
+            <a href="home.php" class="block py-3 text-slate-300">Home</a>
+            <a href="home.php#features" class="block py-3 text-slate-300">Features</a>
+            <a href="home.php#process" class="block py-3 text-slate-300">How It Works</a>
+            <a href="skills.php" class="block py-3 text-white font-semibold">Skills</a>
+            <a href="recruiter.php" class="block py-3 text-slate-300">Recruiters</a>
             <?php if ($is_logged_in): ?>
-                <a href="<?php echo $dashboard_link; ?>" class="block py-2 text-slate-300">Dashboard</a>
-                <a href="auth_system/profile.php" class="block py-2 text-slate-300">Profile</a>
-                <a href="auth_system/logout.php" class="block py-2 text-red-300 font-bold">Logout</a>
+                <a href="<?php echo $dashboard_link; ?>" class="block py-3 text-slate-300">Dashboard</a>
+                <a href="auth_system/profile.php" class="block py-3 text-slate-300">Profile</a>
+                <a href="auth_system/logout.php" class="block py-3 text-red-300 font-bold">Logout</a>
             <?php else: ?>
-                <a href="/auth_system/register.php" class="block py-2 text-slate-300">Sign Up</a>
-                <a href="/auth_system/login.php" class="block py-2 text-blue-300 font-bold">Login</a>
+                <a href="/auth_system/register.php" class="block py-3 text-slate-300">Sign Up</a>
+                <a href="/auth_system/login.php" class="block py-3 text-blue-300 font-bold">Login</a>
             <?php endif; ?>
         </div>
     </header>
 
     <!-- Hero -->
     <section class="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white">
-        <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
             <div>
                 <span class="inline-block bg-white/10 border border-white/10 rounded-full px-4 py-2 text-sm text-blue-100 mb-6">
                     Verified Skill Analysis
                 </span>
 
-                <h2 class="text-4xl md:text-5xl font-extrabold leading-tight">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight">
                     Measure developer skills using real project evidence.
                 </h2>
 
@@ -95,7 +96,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                     technical implementation, and documentation quality to build a trusted skill profile.
                 </p>
 
-                <div class="mt-8 flex flex-wrap gap-4">
+                <div class="mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-4 text-center">
                     <?php if ($is_logged_in): ?>
                         <a
                             href="<?php echo $dashboard_link; ?>"
@@ -128,8 +129,8 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                 </div>
             </div>
 
-            <div class="bg-white text-slate-800 rounded-3xl p-8 shadow-2xl border border-slate-200">
-                <div class="flex items-center justify-between">
+            <div class="bg-white text-slate-800 rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-200">
+                <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h3 class="text-2xl font-extrabold text-slate-900">Skill Summary</h3>
                         <p class="text-sm text-slate-500 mt-1">Evidence-backed technical profile</p>
@@ -140,18 +141,18 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
                     </span>
                 </div>
 
-                <div class="grid grid-cols-3 gap-4 mt-8">
-                    <div class="bg-slate-50 rounded-2xl border p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-8">
+                    <div class="flex items-center justify-between gap-4 sm:block bg-slate-50 rounded-2xl border p-4">
                         <p class="text-3xl font-extrabold text-blue-900">12</p>
                         <p class="text-xs text-slate-500 mt-1">Skills Verified</p>
                     </div>
 
-                    <div class="bg-slate-50 rounded-2xl border p-4">
+                    <div class="flex items-center justify-between gap-4 sm:block bg-slate-50 rounded-2xl border p-4">
                         <p class="text-3xl font-extrabold text-blue-900">24</p>
                         <p class="text-xs text-slate-500 mt-1">Repositories</p>
                     </div>
 
-                    <div class="bg-slate-50 rounded-2xl border p-4">
+                    <div class="flex items-center justify-between gap-4 sm:block bg-slate-50 rounded-2xl border p-4">
                         <p class="text-3xl font-extrabold text-blue-900">82%</p>
                         <p class="text-xs text-slate-500 mt-1">Average Score</p>
                     </div>
@@ -161,7 +162,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
     </section>
 
     <!-- Skill Cards -->
-    <main class="max-w-7xl mx-auto px-6 py-16">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
 
         <div class="text-center max-w-3xl mx-auto">
             <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">
@@ -174,10 +175,10 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
 
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-wrap justify-between items-center gap-3">
                     <h3 class="text-xl font-bold">HTML & CSS</h3>
                     <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Advanced</span>
                 </div>
@@ -193,7 +194,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
             </div>
 
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-wrap justify-between items-center gap-3">
                     <h3 class="text-xl font-bold">JavaScript</h3>
                     <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">Intermediate</span>
                 </div>
@@ -209,7 +210,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
             </div>
 
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-wrap justify-between items-center gap-3">
                     <h3 class="text-xl font-bold">PHP</h3>
                     <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Strong</span>
                 </div>
@@ -225,7 +226,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
             </div>
 
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-wrap justify-between items-center gap-3">
                     <h3 class="text-xl font-bold">SQL</h3>
                     <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">Developing</span>
                 </div>
@@ -241,7 +242,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
             </div>
 
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-wrap justify-between items-center gap-3">
                     <h3 class="text-xl font-bold">Git & GitHub</h3>
                     <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Strong</span>
                 </div>
@@ -257,7 +258,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
             </div>
 
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-wrap justify-between items-center gap-3">
                     <h3 class="text-xl font-bold">Documentation</h3>
                     <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Good</span>
                 </div>
@@ -274,7 +275,7 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
         </div>
 
         <!-- Evidence Table -->
-        <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mt-12">
+        <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-8 mt-12">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <span class="text-xs font-bold tracking-widest text-blue-600 uppercase">
@@ -293,14 +294,14 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
 
                 <a
                     href="<?php echo $is_logged_in ? 'auth_system/dashboard.php' : '/auth_system/register.php'; ?>"
-                    class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-bold text-sm"
+                    class="shrink-0 text-center bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-bold text-sm"
                 >
                     Submit Evidence
                 </a>
             </div>
 
-            <div class="overflow-x-auto mt-8">
-                <table class="w-full text-sm">
+            <div class="overflow-x-auto mt-8" tabindex="0" role="region" aria-label="Scrollable evidence table">
+                <table class="w-full min-w-[560px] text-sm">
                     <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
                         <tr>
                             <th class="text-left px-4 py-3">Skill</th>
@@ -355,10 +356,10 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
 
     <!-- Footer -->
     <footer class="bg-slate-950 text-slate-400 py-8">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-4 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between gap-4 text-sm">
             <p>© 2026 SkillProof. Evidence-Based Developer Assessment Platform.</p>
 
-            <div class="flex gap-5">
+            <div class="flex flex-wrap gap-x-5 gap-y-3">
                 <a href="home.php" class="hover:text-white">Home</a>
                 <a href="recruiter.php" class="hover:text-white">Recruiters</a>
                 <?php if ($is_logged_in): ?>
@@ -370,15 +371,6 @@ $dashboard_link = (($_SESSION["user_role"] ?? "") === "Recruiter") ? "auth_syste
             </div>
         </div>
     </footer>
-
-    <script>
-        const menuButton = document.getElementById("menuButton");
-        const mobileMenu = document.getElementById("mobileMenu");
-
-        menuButton.addEventListener("click", function () {
-            mobileMenu.classList.toggle("hidden");
-        });
-    </script>
 
 </body>
 </html>

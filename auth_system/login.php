@@ -62,23 +62,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillProof - Secure Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=20261110">
+    <script src="../assets/js/navigation.js?v=20261110" defer></script>
 </head>
 
 <body class="min-h-screen bg-slate-100 font-sans text-slate-800">
 
     <!-- Navigation -->
     <header class="bg-slate-950 text-white sticky top-0 z-50 shadow-lg">
-        <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
 
             <!-- Logo -->
-            <a href="/home.php" class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
+            <a href="/home.php" class="flex min-w-0 items-center gap-2 sm:gap-3">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
                     <span class="text-white font-extrabold text-lg">SP</span>
                 </div>
 
                 <div>
-                    <h1 class="text-2xl font-extrabold tracking-wide leading-none">
+                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-wide leading-none">
                         SkillProof
                     </h1>
                     <p class="text-[11px] text-slate-400 mt-1">
@@ -88,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </a>
 
             <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center gap-8 text-sm">
+            <div class="hidden md:flex items-center gap-5 lg:gap-8 text-sm">
                 <a href="/home.php" class="text-slate-300 hover:text-white">Home</a>
                 <a href="/skills.php" class="text-slate-300 hover:text-white">Skills</a>
                 <a href="/recruiter.php" class="text-slate-300 hover:text-white">Recruiters</a>
@@ -99,18 +100,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
 
             <!-- Mobile Menu Button -->
-            <button id="menuButton" class="md:hidden bg-slate-800 px-3 py-2 rounded-lg text-sm">
+            <button id="menuButton" type="button" aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation" class="md:hidden shrink-0 min-h-11 bg-slate-800 px-3 py-2 rounded-lg text-sm">
                 Menu
             </button>
         </nav>
 
         <!-- Mobile Menu -->
-        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 px-6 pb-4 space-y-2 text-sm">
-            <a href="/home.php" class="block py-2 text-slate-300">Home</a>
-            <a href="/skills.php" class="block py-2 text-slate-300">Skills</a>
-            <a href="/recruiter.php" class="block py-2 text-slate-300">Recruiters</a>
-            <a href="register.php" class="block py-2 text-slate-300">Sign Up</a>
-            <a href="login.php" class="block py-2 text-blue-300 font-bold">Login</a>
+        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 px-4 sm:px-6 pb-4 space-y-2 text-sm">
+            <a href="/home.php" class="block py-3 text-slate-300">Home</a>
+            <a href="/skills.php" class="block py-3 text-slate-300">Skills</a>
+            <a href="/recruiter.php" class="block py-3 text-slate-300">Recruiters</a>
+            <a href="register.php" class="block py-3 text-slate-300">Sign Up</a>
+            <a href="login.php" class="block py-3 text-blue-300 font-bold">Login</a>
         </div>
     </header>
 
@@ -163,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </section>
 
         <!-- Right Login Panel -->
-        <section class="flex items-center justify-center px-5 py-10">
+        <section class="min-w-0 flex items-center justify-center px-4 sm:px-5 py-8 sm:py-10">
             <div class="w-full max-w-md">
 
                 <div class="text-center lg:hidden mb-8">
@@ -173,9 +174,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     </p>
                 </div>
 
-                <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 p-8">
+                <div class="min-w-0 bg-white rounded-3xl shadow-2xl border border-slate-200 p-5 sm:p-8">
                     <div class="text-center mb-7">
-                        <h2 class="text-3xl font-extrabold text-blue-950">Welcome Back</h2>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-blue-950">Welcome Back</h2>
                         <p class="text-sm text-slate-500 mt-2">
                             Sign in to access your dashboard.
                         </p>
@@ -233,7 +234,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 placeholder="Enter your password"
                             >
 
-                            <div class="mt-3 flex items-center justify-between">
+                            <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
                                 <label class="flex items-center gap-2 text-sm text-slate-600">
                                     <input type="checkbox" id="showPassword" class="rounded border-slate-300">
                                     Show password
@@ -267,7 +268,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </button>
                     </form>
 
-                    <div class="mt-6 grid grid-cols-2 gap-3 text-xs">
+                    <div class="mt-6 grid grid-cols-1 min-[375px]:grid-cols-2 gap-3 text-xs">
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
                             <p class="font-bold text-slate-700">Developer Access</p>
                             <p class="text-slate-500 mt-1">Verified portal entry</p>
@@ -298,13 +299,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </div>
 
     <script>
-        const menuButton = document.getElementById("menuButton");
-        const mobileMenu = document.getElementById("mobileMenu");
-
-        menuButton.addEventListener("click", function () {
-            mobileMenu.classList.toggle("hidden");
-        });
-
         const loginForm = document.getElementById("loginForm");
         const emailInput = document.getElementById("email");
         const emailMessage = document.getElementById("emailMessage");
