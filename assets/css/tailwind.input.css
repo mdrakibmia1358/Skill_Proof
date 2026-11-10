@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    /* Long account names and URLs must not widen the page. */
+    overflow-wrap: anywhere;
+  }
+
+  :where(.flex, .grid) > * {
+    min-width: 0;
+  }
+
+  input, select, textarea {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  :where(a, button, input, select, textarea):focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 639px) {
+    /* Avoid automatic input zoom on iOS. */
+    input:not([type='checkbox']):not([type='radio']), select, textarea {
+      font-size: 16px;
+    }
+  }
+}
+
+@layer components {
+  #mobileMenu {
+    max-height: calc(100vh - 5rem);
+    max-height: calc(100dvh - 5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  #menuButton {
+    min-height: 44px;
+    min-width: 44px;
+    flex-shrink: 0;
+  }
+}

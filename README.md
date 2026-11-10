@@ -18,12 +18,14 @@ The platform analyzes GitHub repositories, commit history, documentation quality
 
 ## Pages
 
-- `home.html` - Main dashboard page
-- `login.html` - User login page
-- `register.html` - User registration page
-- `skills.html` - Verified skills page
-- `recruiter.html` - Recruiter dashboard page
-- `styles.css` - Main stylesheet
+- `home.php` - Homepage (also served by `index.php`)
+- `skills.php`, `recruiter.php` - Public feature pages
+- `auth_system/login.php`, `auth_system/register.php` - Account access
+- `auth_system/dashboard.php`, `auth_system/recruiter_dashboard.php` - Role-specific dashboards
+- `auth_system/profile.php` - Account profile
+- `assets/css/tailwind.css` - Compiled production stylesheet
+- Root `.html` files and `dashboard-app/` - Legacy frontend demos
+- `styles.css` - Legacy login demo stylesheet
 
 ## Technologies Used
 
@@ -32,6 +34,8 @@ The platform analyzes GitHub repositories, commit history, documentation quality
 - Flexbox
 - CSS Grid
 - Media Query
+- PHP and MySQL
+- Tailwind CSS v3 (compiled locally with Node.js)
 - Git and GitHub
 
 ## Team Members
@@ -101,7 +105,27 @@ Security measures implemented this week:
 
 ## How to Run
 
-Open `home.html` in any modern web browser.
+Serve this PHP application with PHP and MySQL; opening an HTML file only shows
+the legacy demonstration pages. See [DEPLOYMENT.md](DEPLOYMENT.md) for database
+setup and the exact InfinityFree upload list.
 
-```bash
-xdg-open home.html
+The compiled production CSS is included at `assets/css/tailwind.css`. All
+Tailwind pages load this local file; no runtime Tailwind CDN is required.
+
+To change styles, install Node.js 20+ and run:
+
+```sh
+npm ci
+npm run build:css
+```
+
+Use `npm run watch:css` while editing. Tailwind is pinned to **v3.4.17** and scans
+PHP, HTML and JavaScript, excluding dependencies and tests. Its configuration
+preserves the dynamic status/validation palette in a small explicit safelist.
+Keep conditional classes as full strings (`bg-green-500`); arbitrary percentage
+bar widths remain inline styles. Edit `assets/css/tailwind.input.css` or page
+classes, then rebuild; do not edit the generated CSS by hand.
+
+The custom `styles.css` remains separate for the legacy `login.html` page.
+Run the regression checks described in [tests/README.md](tests/README.md),
+including mobile viewport and local CSS checks, before uploading an update.

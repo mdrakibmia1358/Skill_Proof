@@ -1,5 +1,21 @@
 # SkillProof regression tests
 
+Run the responsive browser suite after installing the pinned Node development dependencies and building CSS:
+
+```sh
+npm ci
+npm run build:css
+npm run test:responsive
+```
+
+This requires Chrome/Chromium, Python 3, PHP with PDO MySQL, and the same private MariaDB support as the integration suite below. For custom paths:
+
+```sh
+python3 tests/responsive.py --mariadb-basedir /path/to/private-mariadb/usr --chrome /path/to/chrome --keep-temp
+```
+
+The suite uses the integration runner's disposable database and GitHub mock, copies an explicit allowlist of UI files and local assets, and blocks all non-loopback browser requests. Production database configuration is never read. It checks anonymous pages, populated/empty developer dashboards and profiles, recruiter pages, and logged-in navigation at 320, 375, 390, 430, 768, 1024, and 1440px. Checks include parsed local CSS, absence of the runtime Tailwind script, page/text overflow, menu open/close/Escape/resize, dynamic status and password-strength colors, and phone/desktop navigation and form controls. Wide data tables intentionally scroll inside their own labeled region. Screenshots at 320, 390, and 1440px are saved in the disposable directory; `--keep-temp` preserves these and test logs after the servers stop. These automated Chromium checks supplement visual review; they do not emulate a physical iPhone or Android device.
+
 Run the engine suite (no database or network required):
 
 ```sh

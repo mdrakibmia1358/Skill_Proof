@@ -1,2 +1,6 @@
 # Host-only secrets: never publish database credentials.
 auth_system/db_config.local.php
+node_modules/
+test-results/
+playwright-report/
+__pycache__/

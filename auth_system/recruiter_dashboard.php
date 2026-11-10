@@ -124,14 +124,15 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillProof - Recruiter Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=20261110">
+    <script src="../assets/js/navigation.js?v=20261110" defer></script>
 </head>
 
 <body class="bg-slate-100 text-slate-900">
 
 <div class="min-h-screen flex">
 
-    <aside class="w-64 bg-slate-950 text-white fixed top-0 left-0 h-full hidden lg:flex flex-col">
+    <aside class="w-64 bg-slate-950 text-white fixed top-0 left-0 h-full hidden lg:flex flex-col overflow-y-auto">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-2xl font-extrabold">SkillProof</h1>
             <p class="text-xs text-slate-400 mt-1">Recruiter Portal</p>
@@ -151,36 +152,51 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
         </div>
     </aside>
 
-    <main class="flex-1 lg:ml-64">
+    <main class="min-w-0 flex-1 lg:ml-64">
 
-        <header class="bg-white border-b border-slate-200 px-6 py-5 flex items-center justify-between">
+        <div class="lg:hidden bg-slate-950 text-white">
+            <div class="px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+                <a href="../home.php" class="text-xl font-extrabold">SkillProof</a>
+                <button id="menuButton" type="button" aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle dashboard navigation" data-menu-breakpoint="1024" class="min-h-11 bg-slate-800 px-4 py-2 rounded-lg text-sm font-bold">Menu</button>
+            </div>
+            <nav id="mobileMenu" aria-label="Dashboard navigation" class="hidden lg:hidden border-t border-slate-800 p-4 space-y-2 text-sm">
+                <a href="../home.php" class="block px-4 py-3 rounded-lg hover:bg-slate-800 mb-2 border-b border-slate-800 pb-4">
+                    &larr; Back to Home
+                </a>
+                <a href="recruiter_dashboard.php" class="block px-4 py-3 rounded-lg bg-blue-600 font-bold">Search Developers</a>
+                <a href="profile.php" class="block px-4 py-3 rounded-lg hover:bg-slate-800">My Profile</a>
+                <a href="logout.php" class="block px-4 py-3 rounded-lg bg-red-600 hover:bg-red-500 font-bold">Logout</a>
+            </nav>
+        </div>
+
+        <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h2 class="text-2xl font-extrabold text-slate-950">Recruiter Dashboard</h2>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-slate-950">Recruiter Dashboard</h2>
                 <p class="text-sm text-slate-500">
-                    Signed in as <span class="font-bold text-blue-700"><?php echo safe_output($user_email); ?></span>
+                    Signed in as <span class="font-bold text-blue-700 break-all"><?php echo safe_output($user_email); ?></span>
                 </p>
             </div>
             <span class="px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-bold">Recruiter</span>
         </header>
 
-        <section class="p-6 space-y-6">
+        <section class="p-4 sm:p-6 space-y-6">
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Total Developers</p>
                     <h3 class="text-3xl font-extrabold mt-3"><?php echo safe_output($totalDevelopers); ?></h3>
                 </div>
-                <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Verified (Trust ≥ 50)</p>
                     <h3 class="text-3xl font-extrabold mt-3"><?php echo safe_output($verifiedDevelopers); ?></h3>
                 </div>
-                <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Matching Your Filters</p>
                     <h3 class="text-3xl font-extrabold mt-3"><?php echo safe_output(count($developers)); ?></h3>
                 </div>
             </div>
 
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm">
                 <h3 class="text-xl font-extrabold mb-4">Search Verified Developer Profiles</h3>
 
                 <form method="GET" action="recruiter_dashboard.php" class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -210,7 +226,7 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
                             class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
                     </div>
-                    <div class="md:col-span-4 flex gap-3">
+                    <div class="md:col-span-4 flex flex-wrap gap-3">
                         <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold">
                             Search
                         </button>
@@ -222,18 +238,18 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
             </div>
 
             <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-100">
+                <div class="p-4 sm:p-6 border-b border-slate-100">
                     <h3 class="text-xl font-extrabold">Results</h3>
                     <p class="text-sm text-slate-500">Only developers with at least one completed GitHub analysis are shown.</p>
                 </div>
 
                 <?php if (empty($developers)): ?>
-                    <p class="p-6 text-sm text-slate-400">
+                    <p class="p-4 sm:p-6 text-sm text-slate-400">
                         No developers match these filters yet. Try widening the trust score range or clearing the skill filter.
                     </p>
                 <?php else: ?>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
+                    <div class="overflow-x-auto" role="region" aria-label="Developer results; scroll horizontally to see all columns" tabindex="0">
+                        <table class="w-full min-w-[760px] text-sm">
                             <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
                                 <tr>
                                     <th class="text-left px-5 py-3">Developer</th>
@@ -279,7 +295,7 @@ $verifiedDevelopers = (int) ($verifiedDevelopersStmt->fetch()["c"] ?? 0);
                                             <?php endif; ?>
                                         </td>
                                         <td class="px-5 py-4">
-                                            <a href="report.php?user_id=<?php echo (int) $dev["user_id"]; ?>" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold">Download PDF</a>
+                                            <a href="report.php?user_id=<?php echo (int) $dev["user_id"]; ?>" class="inline-flex min-h-11 items-center justify-center whitespace-nowrap bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold">Download PDF</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

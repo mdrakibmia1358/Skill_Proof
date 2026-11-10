@@ -117,43 +117,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillProof - My Profile</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Locally compiled production styles -->
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=20261110">
+    <script src="../assets/js/navigation.js?v=20261110" defer></script>
 </head>
 <body class="bg-[#0B132B] text-slate-100 min-h-screen font-sans antialiased">
 
     <!-- SkillProof Navigation Bar -->
-    <nav class="bg-[#0B132B] border-b border-slate-800/80 px-6 lg:px-12 py-4 flex items-center justify-between sticky top-0 z-50">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-extrabold text-white text-lg shadow-lg shadow-blue-600/30">
-                SP
+    <header class="bg-[#0B132B] border-b border-slate-800/80 sticky top-0 z-50">
+        <nav class="px-4 sm:px-6 lg:px-12 py-4 flex items-center justify-between gap-3">
+            <div class="flex min-w-0 items-center space-x-2 sm:space-x-3">
+                <div class="w-10 h-10 shrink-0 bg-blue-600 rounded-xl flex items-center justify-center font-extrabold text-white text-lg shadow-lg shadow-blue-600/30">
+                    SP
+                </div>
+                <div>
+                    <h1 class="text-white font-bold text-lg leading-none tracking-tight">SkillProof</h1>
+                    <span class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">Developer Assessment</span>
+                </div>
             </div>
-            <div>
-                <h1 class="text-white font-bold text-lg leading-none tracking-tight">SkillProof</h1>
-                <span class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">Developer Assessment</span>
-            </div>
-        </div>
-        
-        <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
-            <a href="../home.php" class="hover:text-white transition">Home</a>
-            <a href="../skills.php" class="hover:text-white transition">Skills</a>
-            <a href="<?php echo ($user['role'] ?? '') === 'Recruiter' ? 'recruiter_dashboard.php' : 'dashboard.php'; ?>" class="hover:text-white transition">Dashboard</a>
-            <a href="profile.php" class="text-white font-semibold border-b-2 border-blue-500 pb-1">Profile</a>
-        </div>
 
-        <div>
-            <a href="logout.php" class="bg-red-500/90 hover:bg-red-600 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md shadow-red-500/20 transition">
-                Logout
-            </a>
-        </div>
-    </nav>
+            <div class="hidden md:flex items-center space-x-5 lg:space-x-8 text-sm font-medium text-slate-300">
+                <a href="../home.php" class="hover:text-white transition">Home</a>
+                <a href="../skills.php" class="hover:text-white transition">Skills</a>
+                <a href="<?php echo ($user['role'] ?? '') === 'Recruiter' ? 'recruiter_dashboard.php' : 'dashboard.php'; ?>" class="hover:text-white transition">Dashboard</a>
+                <a href="profile.php" class="text-white font-semibold border-b-2 border-blue-500 pb-1">Profile</a>
+            </div>
+
+            <div class="hidden md:block shrink-0">
+                <a href="logout.php" class="bg-red-500/90 hover:bg-red-600 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md shadow-red-500/20 transition">
+                    Logout
+                </a>
+            </div>
+            <button id="menuButton" type="button" aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation" class="md:hidden shrink-0 min-h-11 bg-slate-800 px-3 py-2 rounded-lg text-sm">Menu</button>
+        </nav>
+        <nav id="mobileMenu" aria-label="Mobile navigation" class="hidden md:hidden border-t border-slate-800 px-4 sm:px-6 pb-4 space-y-2 text-sm">
+            <a href="../home.php" class="block py-3 text-slate-300">Home</a>
+            <a href="../skills.php" class="block py-3 text-slate-300">Skills</a>
+            <a href="<?php echo ($user['role'] ?? '') === 'Recruiter' ? 'recruiter_dashboard.php' : 'dashboard.php'; ?>" class="block py-3 text-slate-300">Dashboard</a>
+            <a href="profile.php" class="block py-3 text-white font-semibold">Profile</a>
+            <a href="logout.php" class="block py-3 text-red-300 font-bold">Logout</a>
+        </nav>
+    </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-6xl mx-auto px-6 py-12">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-            
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-start">
+
             <!-- Left Column: Profile Form -->
-            <div class="lg:col-span-7 space-y-6">
+            <div class="min-w-0 lg:col-span-7 space-y-6">
                 <div class="inline-flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 rounded-full px-4 py-1.5 text-xs text-slate-300 font-medium">
                     <span class="w-2 h-2 rounded-full <?php echo (($user['role'] ?? '') === 'Recruiter' || ($latestAnalysis && ($latestAnalysis['trust_score'] ?? 0) > 0)) ? 'bg-blue-400 animate-pulse' : 'bg-slate-500'; ?>"></span>
                     <span>
@@ -169,10 +180,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                     </span>
                 </div>
 
-                <h1 class="text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
                     Manage your <span class="text-blue-500">SkillProof</span> developer profile.
                 </h1>
-                
+
                 <p class="text-slate-400 text-sm leading-relaxed">
                     SkillProof helps developers prove their technical skills using project work, GitHub activity, and verification records. Keep your profile updated for recruiter evaluation.
                 </p>
@@ -192,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                 <?php endif; ?>
 
                 <!-- Profile Form -->
-                <div class="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 lg:p-8 shadow-2xl backdrop-blur-sm">
+                <div class="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-5 sm:p-6 lg:p-8 shadow-2xl backdrop-blur-sm">
                     <form action="profile.php" method="POST" class="space-y-5">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                         <div>
@@ -225,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Developer Bio & Summary</label>
                             <textarea name="bio" rows="4" 
-                                class="w-full bg-slate-800/90 border border-slate-700 text-white px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition placeholder-slate-500" 
+                                class="w-full bg-slate-800/90 border border-slate-700 text-white px-4 py-3 rounded-xl text-base sm:text-sm focus:outline-none focus:border-blue-500 transition placeholder-slate-500"
                                 placeholder="Describe your core technical stack, GitHub projects, and experience..."><?php echo htmlspecialchars($user['bio'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                         </div>
 
@@ -240,10 +251,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
             </div>
 
             <!-- Right Column: Real profile summary (role-aware) -->
-            <div class="lg:col-span-5">
+            <div class="min-w-0 lg:col-span-5">
                 <?php if (($user['role'] ?? '') === 'Recruiter'): ?>
 
-                    <div class="bg-white text-slate-900 rounded-3xl p-8 shadow-2xl space-y-6">
+                    <div class="bg-white text-slate-900 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-6">
                         <div>
                             <h3 class="font-extrabold text-xl text-slate-900 tracking-tight">Recruiter Activity</h3>
                             <p class="text-xs text-slate-500 mt-0.5">Your report generation history</p>
@@ -259,8 +270,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
 
                 <?php elseif ($latestAnalysis): ?>
 
-                    <div class="bg-white text-slate-900 rounded-3xl p-8 shadow-2xl space-y-6">
-                        <div class="flex justify-between items-start">
+                    <div class="bg-white text-slate-900 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-6">
+                        <div class="flex flex-wrap justify-between items-start gap-3">
                             <div>
                                 <h3 class="font-extrabold text-xl text-slate-900 tracking-tight">Developer Trust Profile</h3>
                                 <p class="text-xs text-slate-500 mt-0.5">Evidence-backed skill overview</p>
@@ -282,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                                     $labelColor = $score >= 70 ? 'text-emerald-600' : ($score >= 40 ? 'text-amber-600' : 'text-red-500');
                                 ?>
                                     <div>
-                                        <div class="flex justify-between text-xs font-bold mb-1.5">
+                                        <div class="flex flex-wrap justify-between gap-2 text-xs font-bold mb-1.5">
                                             <span class="text-slate-800"><?php echo htmlspecialchars($skill['skill_name'], ENT_QUOTES, 'UTF-8'); ?></span>
                                             <span class="<?php echo $labelColor; ?>"><?php echo htmlspecialchars($skill['status'], ENT_QUOTES, 'UTF-8'); ?></span>
                                         </div>
@@ -294,16 +305,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                             <?php endif; ?>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100">
-                            <div class="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
+                        <div class="grid grid-cols-1 min-[390px]:grid-cols-3 gap-3 pt-4 border-t border-slate-100">
+                            <div class="bg-slate-50 p-2 sm:p-3 rounded-2xl text-center border border-slate-100">
                                 <span class="block text-2xl font-black text-blue-600 leading-tight"><?php echo (int) ($latestAnalysis['trust_score'] ?? 0); ?></span>
                                 <span class="text-[10px] font-semibold text-slate-500 uppercase">Trust Score</span>
                             </div>
-                            <div class="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
+                            <div class="bg-slate-50 p-2 sm:p-3 rounded-2xl text-center border border-slate-100">
                                 <span class="block text-2xl font-black text-slate-800 leading-tight"><?php echo (int) $verifiedSkillsCount; ?></span>
                                 <span class="text-[10px] font-semibold text-slate-500 uppercase">Verified Skills</span>
                             </div>
-                            <div class="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
+                            <div class="bg-slate-50 p-2 sm:p-3 rounded-2xl text-center border border-slate-100">
                                 <span class="block text-2xl font-black text-slate-800 leading-tight"><?php echo (int) ($latestAnalysis['total_repositories'] ?? 0); ?></span>
                                 <span class="text-[10px] font-semibold text-slate-500 uppercase">Repositories</span>
                             </div>
@@ -316,7 +327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
 
                 <?php else: ?>
 
-                    <div class="bg-white text-slate-900 rounded-3xl p-8 shadow-2xl space-y-4 text-center">
+                    <div class="bg-white text-slate-900 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-4 text-center">
                         <h3 class="font-extrabold text-xl text-slate-900 tracking-tight">Developer Trust Profile</h3>
                         <p class="text-sm text-slate-500">
                             No GitHub analysis yet. Visit your

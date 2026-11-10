@@ -88,27 +88,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillProof - Create Account</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/tailwind.css?v=20261110">
+    <script src="../assets/js/navigation.js?v=20261110" defer></script>
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans">
 
     <!-- Navigation -->
     <header class="bg-slate-950 text-white sticky top-0 z-50 shadow-lg">
-        <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
 
-            <a href="/home.php" class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
+            <a href="/home.php" class="flex min-w-0 items-center gap-2 sm:gap-3">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
                     <span class="text-white font-extrabold text-lg">SP</span>
                 </div>
 
                 <div>
-                    <h1 class="text-2xl font-extrabold tracking-wide leading-none">SkillProof</h1>
+                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-wide leading-none">SkillProof</h1>
                     <p class="text-[11px] text-slate-400 mt-1">Developer Assessment</p>
                 </div>
             </a>
 
-            <div class="hidden md:flex items-center gap-8 text-sm">
+            <div class="hidden md:flex items-center gap-5 lg:gap-8 text-sm">
                 <a href="/home.php" class="text-slate-300 hover:text-white">Home</a>
                 <a href="/skills.php" class="text-slate-300 hover:text-white">Skills</a>
                 <a href="/recruiter.php" class="text-slate-300 hover:text-white">Recruiters</a>
@@ -121,13 +122,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
                     Login
                 </a>
             </div>
+            <button id="menuButton" type="button" aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation" class="md:hidden shrink-0 min-h-11 bg-slate-800 px-3 py-2 rounded-lg text-sm">
+                Menu
+            </button>
         </nav>
+        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 px-4 sm:px-6 pb-4 space-y-2 text-sm">
+            <a href="/home.php" class="block py-3 text-slate-300">Home</a>
+            <a href="/skills.php" class="block py-3 text-slate-300">Skills</a>
+            <a href="/recruiter.php" class="block py-3 text-slate-300">Recruiters</a>
+            <a href="register.php" class="block py-3 text-white font-semibold">Sign Up</a>
+            <a href="login.php" class="block py-3 text-blue-300 font-bold">Login</a>
+        </div>
     </header>
 
     <!-- Main Register Section -->
     <main class="min-h-screen bg-gradient-to-br from-slate-100 via-white to-blue-50">
 
-        <section class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 
             <!-- Left Content -->
             <div>
@@ -135,7 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
                     Developer Verification Portal
                 </span>
 
-                <h2 class="text-4xl md:text-5xl font-extrabold text-slate-950 leading-tight">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-950 leading-tight">
                     Create your trusted SkillProof profile.
                 </h2>
 
@@ -146,9 +157,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
             </div>
 
             <!-- Register Card -->
-            <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 p-8">
+            <div class="min-w-0 bg-white rounded-3xl shadow-2xl border border-slate-200 p-5 sm:p-8">
                 <div class="text-center mb-7">
-                    <h2 class="text-3xl font-extrabold text-blue-950">Create Account</h2>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-blue-950">Create Account</h2>
                     <p class="text-sm text-slate-500 mt-2">
                         Start your SkillProof developer verification profile.
                     </p>
@@ -232,7 +243,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
                             placeholder="Create a password"
                         >
 
-                        <div class="mt-3 flex items-center justify-between">
+                        <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
                             <label class="flex items-center gap-2 text-sm text-slate-600">
                                 <input type="checkbox" id="showPassword" class="rounded border-slate-300">
                                 Show password
@@ -286,7 +297,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
 
     <!-- Footer -->
     <footer class="bg-slate-950 text-slate-400 py-8">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-4 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between gap-4 text-sm">
             <p>© 2026 SkillProof. Evidence-Based Developer Assessment Platform.</p>
         </div>
     </footer>

@@ -13,7 +13,7 @@ appContainer.innerHTML = `
     </p>
   </header>
 
-  <main class="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-100 max-w-lg mx-auto">
+  <main class="bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-md border border-gray-100 max-w-lg mx-auto">
     <form id="registration-form" novalidate class="space-y-6">
 
       <div>
