@@ -22,6 +22,13 @@ if ($developer_user_id <= 0) {
 
 $pdo = skillproof_db();
 
+$recruiterStmt = $pdo->prepare("SELECT user_id FROM users WHERE email = ? AND role = 'Recruiter' LIMIT 1");
+$recruiterStmt->execute([$_SESSION["user_email"]]);
+if (!$recruiterStmt->fetch()) {
+    header("Location: login.php");
+    exit();
+}
+
 // 2. Resolve the recruiter's own user_id (for the recruiter_reports log).
 $recruiterStmt = $pdo->prepare("SELECT user_id FROM users WHERE email = ? LIMIT 1");
 $recruiterStmt->execute([$_SESSION["user_email"]]);

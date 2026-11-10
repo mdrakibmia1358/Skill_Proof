@@ -10,6 +10,7 @@ import re
 import shutil
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.error
@@ -219,8 +220,18 @@ require $file;
             "csrf_token": token, "fullName": "Synthetic " + role, "email": email,
             "github": github, "password": PASSWORD, "role": role,
         })
-        expected = "recruiter_dashboard.php" if role == "Recruiter" else "dashboard.php"
+        expected = "dashboard.php"
         check(response[0] in (302, 303) and response[1].get("Location") == expected, "Registration redirect failed")
+        return browser
+
+    def login(self, email, role="Developer"):
+        browser = Browser(self.base)
+        token = browser.token("/auth_system/login.php")
+        response = browser.request("/auth_system/login.php", {
+            "csrf_token": token, "email": email, "password": PASSWORD,
+        })
+        expected = "recruiter_dashboard.php" if role == "Recruiter" else "dashboard.php"
+        check(response[0] in (302, 303) and response[1].get("Location") == expected, "Synthetic login failed")
         return browser
 
     def analyze(self, browser, token=None, extra=None):
@@ -241,6 +252,23 @@ require $file;
         check(not self.db("SELECT * FROM skill_analyses"), "Registration created an analysis")
         check(not self.api_calls(), "Registration called GitHub")
         self.passed_test("developer registration creates account with zero GitHub requests")
+
+        for index, role in enumerate(("Recruiter", "Admin"), start=1):
+            browser = Browser(self.base)
+            email = f"tampered-{index}@example.test"
+            token = browser.token("/auth_system/register.php")
+            response = browser.request("/auth_system/register.php", {
+                "csrf_token": token, "fullName": "Tampered " + role, "email": email,
+                "github": f"tampered-{index}", "password": PASSWORD, "role": role,
+            })
+            check(response[0] in (302, 303) and response[1].get("Location") == "dashboard.php",
+                  f"Tampered role={role} did not create a developer session")
+            account = self.db("SELECT role FROM users WHERE email = ?", [email])
+            check(len(account) == 1 and account[0]["role"] == "Developer",
+                  f"Tampered role={role} was persisted")
+            check(browser.get("/auth_system/recruiter_dashboard.php")[1].get("Location") == "dashboard.php",
+                  f"Tampered role={role} reached recruiter dashboard")
+        self.passed_test("direct role=Recruiter and role=Admin POST submissions remain developers")
 
         before = self.snapshot()
         for _ in range(3):
@@ -355,7 +383,9 @@ require $file;
         check(report[0] in (302, 303) or report[0] == 403, "Developer could read recruiter-only report")
         self.passed_test("developer dashboard/profile ignore another user's IDs; recruiter report is inaccessible")
 
-        recruiter = self.register("recruiter@example.test", "mock-recruiter", "Recruiter")
+        self.register("recruiter@example.test", "mock-recruiter", "Recruiter")
+        self.db("UPDATE users SET role = 'Recruiter' WHERE email = ?", ["recruiter@example.test"])
+        recruiter = self.login("recruiter@example.test", "Recruiter")
         before = self.snapshot()
         check(recruiter.get()[1].get("Location") == "recruiter_dashboard.php", "Recruiter developer-dashboard guard changed")
         recruiter_post = recruiter.request("/auth_system/dashboard.php", {
@@ -398,14 +428,35 @@ require $file;
             self.passed_test(f"{role} session timeout clears authentication and shows one-use session flash")
 
     def close(self):
+        database_socket = self.work / "db.sock"
+        mariadb_admin = shutil.which("mariadb-admin")
+        if database_socket.exists() and mariadb_admin:
+            try:
+                subprocess.run(
+                    [mariadb_admin, "--no-defaults", f"--socket={database_socket}", "-u", "root", "shutdown"],
+                    env=self.env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    timeout=10, check=False,
+                )
+            except (OSError, subprocess.TimeoutExpired):
+                pass
         for process in reversed(self.processes):
-            if process.poll() is None:
+            if process.poll() is not None:
+                continue
+            try:
                 process.terminate()
+            except (PermissionError, ProcessLookupError):
+                pass
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
                 try:
-                    process.wait(timeout=10)
-                except subprocess.TimeoutExpired:
                     process.kill()
+                except (PermissionError, ProcessLookupError):
+                    print(f"Could not terminate test process {process.pid}", file=sys.stderr)
+                try:
                     process.wait()
+                except (PermissionError, subprocess.TimeoutExpired):
+                    print(f"Test process {process.pid} may still be running", file=sys.stderr)
         for log in self.logs:
             log.close()
 

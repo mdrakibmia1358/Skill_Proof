@@ -234,7 +234,8 @@ try {
     await recruiter.setViewportSize({ width, height: 900 });
     await recruiter.goto(fixture.base + '/auth_system/recruiter_dashboard.php');
     await recruiter.locator('[name="skill"]').fill('PHP');
-    await recruiter.locator('button[type="submit"]').click();
+    await recruiter.locator('form').filter({ has: recruiter.locator('[name="skill"]') })
+      .locator('button[type="submit"]').click();
     await recruiter.waitForLoadState('load');
     assert.equal(new URL(recruiter.url()).searchParams.get('skill'), 'PHP', 'Recruiter filter submits');
     await checkCSS(recruiter, `recruiter filtered @${width}`);

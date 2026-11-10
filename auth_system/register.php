@@ -27,7 +27,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
     $email     = trim(filter_input(INPUT_POST, "email", FILTER_SANITIZE_EMAIL) ?? "");
     $github    = trim($_POST["github"] ?? "");
     $password  = $_POST["password"] ?? "";
-    $role      = ($_POST["role"] ?? "Developer") === "Recruiter" ? "Recruiter" : "Developer";
+    // Public registration can only create developer accounts. Recruiter accounts
+    // are provisioned separately through an authorized process.
+    $role      = "Developer";
 
     if (strlen($full_name) < 3) {
         $error_message = "Full name should contain at least 3 characters.";
@@ -261,20 +263,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !sp_csrf_verify($_POST["csrf_token"
                                 Use at least 8 characters with uppercase, number, and special character.
                             </p>
                         </div>
-                    </div>
-
-                    <div>
-                        <label for="role" class="block text-sm font-bold text-slate-700 mb-2">
-                            Account Role
-                        </label>
-                        <select
-                            id="role"
-                            name="role"
-                            class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition bg-white"
-                        >
-                            <option value="Developer" <?php echo $role === "Developer" ? "selected" : ""; ?>>Developer</option>
-                            <option value="Recruiter" <?php echo $role === "Recruiter" ? "selected" : ""; ?>>Recruiter</option>
-                        </select>
                     </div>
 
                     <button

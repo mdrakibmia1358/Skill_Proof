@@ -59,11 +59,16 @@ require $file;
         ])
     runner.register("empty.developer@responsive.example.test", "synthetic-empty")
     runner.db("UPDATE users SET github_username = NULL WHERE email = ?", ["empty.developer@responsive.example.test"])
-    runner.register("recruiter.with.a.long.synthetic.address@responsive.example.test", "synthetic-recruiter", "Recruiter")
+    recruiter_email = "recruiter.with.a.long.synthetic.address@responsive.example.test"
+    runner.register(recruiter_email, "synthetic-recruiter", "Recruiter")
+    runner.db("UPDATE users SET role = 'Recruiter' WHERE email = ?", [recruiter_email])
+    recruiter = runner.login(recruiter_email, "Recruiter")
+    if recruiter.get("/auth_system/recruiter_dashboard.php")[0] != 200:
+        raise AssertionError("Authorized recruiter fixture cannot access recruiter dashboard")
     return {
         "base": runner.base,
         "accounts": {"developer": email, "empty": "empty.developer@responsive.example.test",
-                     "recruiter": "recruiter.with.a.long.synthetic.address@responsive.example.test"},
+                     "recruiter": recruiter_email},
         "password": PASSWORD,
         "screenshots": str(runner.work / "screenshots"),
     }
