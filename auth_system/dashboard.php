@@ -199,7 +199,7 @@ if ($current_user_id) {
 }
 
 $has_saved_analysis = $latestAnalysis !== null;
-$github_connected = $has_saved_analysis && $latestAnalysis["github_username"] === $github_username;
+$github_connected = $has_saved_analysis && strcasecmp((string)$latestAnalysis["github_username"], (string)$github_username) === 0;
 $analysis_username_changed = $has_saved_analysis && !$github_connected;
 $repoStats = [
     "total" => (int) ($latestAnalysis["total_repositories"] ?? 0),

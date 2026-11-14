@@ -1,0 +1,2 @@
+# PHPMailer dependency files should never be downloaded directly from a browser.
+Require all denied

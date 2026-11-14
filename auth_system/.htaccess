@@ -2,3 +2,8 @@
 <FilesMatch "^db_config\.(local|example)\.php$">
     Require all denied
 </FilesMatch>
+
+# Prevent public access to SMTP credentials and reset implementation.
+<FilesMatch "^(password_reset_config\.(local|example)\.php|password_reset_helpers\.php)$">
+    Require all denied
+</FilesMatch>

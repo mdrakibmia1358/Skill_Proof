@@ -4,3 +4,7 @@ node_modules/
 test-results/
 playwright-report/
 __pycache__/
+
+# SMTP password recovery secrets and dependencies
+/auth_system/password_reset_config.local.php
+/auth_system/vendor_mailer/
