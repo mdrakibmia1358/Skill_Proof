@@ -268,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                         </a>
                     </div>
 
-                <?php elseif ($latestAnalysis): ?>
+                <?php elseif ($latestAnalysis && strcasecmp((string)$latestAnalysis['github_username'], (string)($user['github_username'] ?? '')) === 0): ?>
 
                     <div class="bg-white text-slate-900 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-6">
                         <div class="flex flex-wrap justify-between items-start gap-3">
@@ -330,7 +330,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sp_csrf_verify($_POST['csrf_token'
                     <div class="bg-white text-slate-900 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-4 text-center">
                         <h3 class="font-extrabold text-xl text-slate-900 tracking-tight">Developer Trust Profile</h3>
                         <p class="text-sm text-slate-500">
-                            No GitHub analysis yet. Visit your
+                            No saved analysis for your current GitHub username. Existing historical results remain stored. Visit your
                             <a href="dashboard.php" class="text-blue-600 font-semibold underline">Dashboard</a>
                             to connect and verify your GitHub account.
                         </p>
