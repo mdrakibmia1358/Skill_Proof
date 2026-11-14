@@ -267,6 +267,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             Login
                         </button>
                     </form>
+                    <p class="mt-4 text-center text-sm">
+                        <a class="font-semibold text-blue-700 hover:underline" href="password_reset.php">Forgot your password?</a>
+                    </p>
 
                     <div class="mt-6 grid grid-cols-1 min-[375px]:grid-cols-2 gap-3 text-xs">
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
