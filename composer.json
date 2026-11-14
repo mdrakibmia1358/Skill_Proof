@@ -1,0 +1,12 @@
+{
+  "name": "skillproof/password-recovery",
+  "description": "SMTP transport for SkillProof password recovery",
+  "type": "project",
+  "require": {
+    "phpmailer/phpmailer": "^6.9"
+  },
+  "config": {
+    "vendor-dir": "auth_system/vendor_mailer",
+    "allow-plugins": false
+  }
+}
